@@ -1,0 +1,9 @@
+
+validate no parameters make them exceptions
+/*
+File::create($file, $mode = "r");
+File::rename($old, $new);
+File::copy($old, $new);
+File::move($from, $to);
+File::delete($file);
+*/

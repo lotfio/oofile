@@ -1,0 +1,16 @@
+{
+    "name": "lotfio/oofile",
+    "description": "PHP file Helper",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "lotfio",
+            "email": "a.lakehal@createam-dz.com"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "OoFile\\" : "src/OoFile/"
+        }
+    }
+}
