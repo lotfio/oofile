@@ -1,17 +1,12 @@
-<?php
+<?php declare(strict_types=1);
 
 use OoFile\File;
+use Ouch\Reporter;
 
 require 'vendor/autoload.php';
 
-try{
+(new Reporter)->on();
+
 
 $file = new File;
-$file->rename("azaz");
-
-}catch(\Exception $e)
-{
-    echo(get_class($e));
-    echo "\n";
-    die($e->getMessage());
-}
+$file->move();

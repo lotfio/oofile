@@ -2,6 +2,7 @@
 
 use OoFile\Exceptions\FileNameException;
 use OoFile\Exceptions\FileModeException;
+use OoFile\Exceptions\FileNotFoundException;
 use OoFile\Exceptions\FilePermissionsException;
 
 class File
@@ -35,12 +36,10 @@ class File
             throw new FileNameException("please provide valid filename string");
 
         if(!is_writable(getcwd()))
-            throw new FilePermissionsException("you don't have permissions to create a file in this dir getcwd()");
+            throw new FilePermissionsException("you don't have permissions to create a file in this dir");
 
         if(!in_array($mode, $this->mods))
             throw new FileModeException("$mode file mode not supported");
-
-        $file = getcwd() . DIRECTORY_SEPARATOR . ltrim($file, "/");
 
         fopen($file, $mode);
         return file_exists($file);
@@ -59,7 +58,7 @@ class File
             throw new FileNameException("old and new file names must be valid strings");
 
         if(!file_exists($old))
-            throw new \Exception("file $old not found", 404);
+            throw new FileNotFoundException("file $old not found", 404);
 
         return rename($old, $new);
     }
@@ -71,13 +70,13 @@ class File
      * @param  string $new new file name
      * @return bool
      */
-    public function copy($old, $new) : bool
+    public function copy(string $old, string $new) : bool
     {
         if(!is_string($old) || !is_string($new))
             throw new FileNameException("old and new file names must be valid strings");
 
         if(!file_exists($old))
-            throw new \Exception("file $old not found", 404);
+            throw new FileNotFoundException("file $old not found", 404);
 
         if(is_dir($new))
             throw new \Exception("the new file name is required ", 404);
@@ -92,7 +91,7 @@ class File
      * @param  string $new new file name
      * @return bool
      */
-    public function move($file, $destination) : bool
+    public function move(string $file, string $destination) : bool
     {
         if(!is_string($file) || !is_string($destination))
             throw new FileNameException("file name $file and distination $destination must be valid strings");
@@ -117,7 +116,7 @@ class File
      * @param  string $new new file name
      * @return bool
      */
-    public function delete($file) : bool
+    public function delete(string $file) : bool
     {
         if(!is_string($file))
             throw new FileNameException("file name $file must be valid string");

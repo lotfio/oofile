@@ -7,3 +7,6 @@ File::copy($old, $new);
 File::move($from, $to);
 File::delete($file);
 */
+https://cweiske.de/tagebuch/php-auto-coloring-output.htm
+
+if notice exception change filename
