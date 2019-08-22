@@ -1,9 +1,9 @@
 <?php namespace OoFile;
 
-use OoFile\Exceptions\FileNameException;
-use OoFile\Exceptions\FileModeException;
-use OoFile\Exceptions\FileNotFoundException;
-use OoFile\Exceptions\FilePermissionsException;
+use OoFile\Exceptions\FileNameException; //1
+use OoFile\Exceptions\FileModeException; //2
+use OoFile\Exceptions\FileNotFoundException; //3
+use OoFile\Exceptions\FilePermissionsException; //4
 
 class File
 {
@@ -33,13 +33,13 @@ class File
     public function create(string $file, string $mode = "w+") : bool
     {
         if(!is_string($file) || is_dir($file))
-            throw new FileNameException("please provide valid filename string");
+            throw new FileNameException("please provide valid filename string", 1);
 
         if(!is_writable(getcwd()))
-            throw new FilePermissionsException("you don't have permissions to create a file in this dir");
+            throw new FilePermissionsException("you don't have permissions to create a file in this dir", 4);
 
         if(!in_array($mode, $this->mods))
-            throw new FileModeException("$mode file mode not supported");
+            throw new FileModeException("$mode file mode not supported", 2);
 
         fopen($file, $mode);
         return file_exists($file);
@@ -55,10 +55,10 @@ class File
     public function rename(string $old, string $new) : bool
     {
         if(!is_string($old) || !is_string($new))
-            throw new FileNameException("old and new file names must be valid strings");
+            throw new FileNameException("old and new file names must be valid strings", 1);
 
         if(!file_exists($old))
-            throw new FileNotFoundException("file $old not found", 404);
+            throw new FileNotFoundException("file $old not found", 3);
 
         return rename($old, $new);
     }
@@ -72,14 +72,11 @@ class File
      */
     public function copy(string $old, string $new) : bool
     {
-        if(!is_string($old) || !is_string($new))
-            throw new FileNameException("old and new file names must be valid strings");
+        if(!is_string($old) || !is_string($new) || is_dir($old) || is_dir($new))
+            throw new FileNameException("old and new file names must be valid strings", 1);
 
         if(!file_exists($old))
-            throw new FileNotFoundException("file $old not found", 404);
-
-        if(is_dir($new))
-            throw new \Exception("the new file name is required ", 404);
+            throw new FileNotFoundException("file $old not found", 3);
 
         return copy($old, $new);
     }
@@ -94,13 +91,13 @@ class File
     public function move(string $file, string $destination) : bool
     {
         if(!is_string($file) || !is_string($destination))
-            throw new FileNameException("file name $file and distination $destination must be valid strings");
+            throw new FileNameException("file name $file and distination $destination must be valid strings", 1);
 
         if(!file_exists($file))
-            throw new \Exception("file $file not found", 404);
+            throw new \FileNotFoundException("file $file not found", 4);
 
         if(!is_dir($destination))
-            throw new \Exception("destination $destination doesn't seem to be a valid directory", 404);
+            throw new \Exception("destination $destination doesn't seem to be a valid directory", 4);
 
         $destination = trim($destination, "/") . DIRECTORY_SEPARATOR . $file;
 
@@ -119,10 +116,10 @@ class File
     public function delete(string $file) : bool
     {
         if(!is_string($file))
-            throw new FileNameException("file name $file must be valid string");
+            throw new FileNameException("file name $file must be valid string", 1);
 
         if(!file_exists($file))
-            throw new \Exception("file $file not found", 404);
+            throw new FileNotFoundException("file $file not found", 4);
 
         return unlink($file);
     }
