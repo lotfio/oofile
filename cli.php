@@ -8,5 +8,4 @@ require 'vendor/autoload.php';
 (new Reporter)->on();
 
 
-$file = new File;
-$file->move();
+echo conf("ahmed", "said");
