@@ -55,7 +55,7 @@ class Conf
     public function add(string $path)
     {
 
-        if(!is_dir($path) && !is_file($path)) throw new \Exception("must be file a dir", 1);
+        if(!is_dir($path) && !is_file($path)) throw new FileNameException("wrong file or directory path", 1);
 
         if(is_dir($path))
         {
@@ -68,7 +68,7 @@ class Conf
             {
                 if(pathinfo($file, PATHINFO_EXTENSION) == "php") // if php file
                 {
-                    if(!file_exists($path . DIRECTORY_SEPARATOR . $file)) throw new \Exception("cannot find file pelase provide an absolute path", 1);
+                    if(!file_exists($path . DIRECTORY_SEPARATOR . $file)) throw new FileNotFoundException("cannot find file pelase provide an absolute path", 3);
                     $arrayFile = require $path . DIRECTORY_SEPARATOR . $file;
                     if(is_array($arrayFile)) $this->config = array_merge($this->config, $arrayFile);
                 }
