@@ -21,10 +21,6 @@
         }
     },
 
-    "require": {
-        "lotfio/ouch": "^0.1.7"
-    },
-
     "require-dev": {
         "phpunit/phpunit": "^8"
     }
