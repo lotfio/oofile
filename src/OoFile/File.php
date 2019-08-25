@@ -33,6 +33,7 @@ use OoFile\Exceptions\FileNameException; //1
 use OoFile\Exceptions\FileModeException; //2
 use OoFile\Exceptions\FileNotFoundException; //3
 use OoFile\Exceptions\FilePermissionsException; //4
+use OoFile\Exceptions\DirectoryNotFoundException; //5
 
 class File
 {
@@ -123,12 +124,12 @@ class File
             throw new FileNameException("file name $file and distination $destination must be valid strings", 1);
 
         if(!file_exists($file))
-            throw new \FileNotFoundException("file $file not found", 4);
+            throw new FileNotFoundException("file $file not found", 4);
 
         if(!is_dir($destination))
-            throw new \Exception("destination $destination doesn't seem to be a valid directory", 4);
+            throw new DirectoryNotFoundException("destination $destination doesn't seem to be a valid directory", 4);
 
-        $destination = trim($destination, "/") . DIRECTORY_SEPARATOR . $file;
+        $destination = trim($destination, "/") . DIRECTORY_SEPARATOR . pathinfo($file, PATHINFO_FILENAME) .".". pathinfo($file, PATHINFO_EXTENSION);
 
         copy($file, $destination);
 
