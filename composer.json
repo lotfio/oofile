@@ -5,7 +5,7 @@
     "authors": [
         {
             "name": "lotfio",
-            "email": "a.lakehal@createam-dz.com"
+            "email": "contact@lotfio.net"
         }
     ],
     "autoload": {
@@ -22,6 +22,6 @@
     },
 
     "require-dev": {
-        "phpunit/phpunit": "^8"
+        "phpunit/phpunit": "8.*"
     }
 }

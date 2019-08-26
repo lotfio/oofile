@@ -42,7 +42,7 @@ class Conf
      *
      * @var array
      */
-    private $config = array(
+    public static $config = array(
 
     );
 
@@ -52,7 +52,7 @@ class Conf
      * @param string $path
      * @return void
      */
-    public function add(string $path)
+    public static function add(string $path)
     {
 
         if(!is_dir($path) && !is_file($path)) throw new FileNameException("wrong file or directory path", 1);
@@ -70,7 +70,7 @@ class Conf
                 {
                     if(!file_exists($path . DIRECTORY_SEPARATOR . $file)) throw new FileNotFoundException("cannot find file pelase provide an absolute path", 3);
                     $arrayFile = require $path . DIRECTORY_SEPARATOR . $file;
-                    if(is_array($arrayFile)) $this->config = array_merge($this->config, $arrayFile);
+                    if(is_array($arrayFile)) self::$config = array_merge(self::$config, $arrayFile);
                 }
 
             }
@@ -81,7 +81,7 @@ class Conf
             if(pathinfo($path, PATHINFO_EXTENSION) == "php")
             {
                 $arrayFile = require $path;
-                if(is_array($arrayFile)) $this->config = array_merge($this->config, $arrayFile);
+                if(is_array($arrayFile)) self::$config = array_merge(self::$config, $arrayFile);
             }
         }
     }
@@ -92,17 +92,17 @@ class Conf
      * @param  string $key
      * @return mixed
      */
-    public function get(string $key, $value = NULL)
+    public static function get(string $key, $value = NULL)
     {
         if(is_null($value))
         {
-            if(!$this->exists($key))
+            if(!self::exists($key))
             throw new \Exception("$key doesn't exists", 1);
 
-            return $this->config[$key];
+            return self::$config[$key];
         }
 
-        return $this->config[$key] = $value;
+        return self::$config[$key] = $value;
     }
 
     /**
@@ -111,9 +111,9 @@ class Conf
      * @param  string $key
      * @return boolean
      */
-    public function exists(string $key) : bool
+    public static function exists(string $key) : bool
     {
-        return array_key_exists($key, $this->config);
+        return array_key_exists($key, self::$config);
     }
 }
 

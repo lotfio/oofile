@@ -35,7 +35,6 @@ if(!function_exists("conf"))
 {
     function conf($key, $value = NULL)
     {
-        $conf = new Conf;
-        return $conf->get($key, $value);
+        return Conf::get($key, $value);
     }
 }
