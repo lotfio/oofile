@@ -29,20 +29,20 @@
  * SOFTWARE.
  */
 
+use Exception;
 use OoFile\Exceptions\FileNameException; //1
-use OoFile\Exceptions\FileModeException; //2
 use OoFile\Exceptions\FileNotFoundException; //3
-use OoFile\Exceptions\FilePermissionsException; //4
+use OoFile\Exceptions\ConfigException; //3
 
 class Conf
 {
     /**
      * config array
-     * all config arrays siuld be merged to this array
+     * all config arrays should be merged to this array
      *
      * @var array
      */
-    public static $config = array(
+    public static $configArray = array(
 
     );
 
@@ -70,7 +70,9 @@ class Conf
                 {
                     if(!file_exists($path . DIRECTORY_SEPARATOR . $file)) throw new FileNotFoundException("cannot find file pelase provide an absolute path", 3);
                     $arrayFile = require $path . DIRECTORY_SEPARATOR . $file;
-                    if(is_array($arrayFile)) self::$config = array_merge(self::$config, $arrayFile);
+
+                    $file = pathinfo($file, PATHINFO_FILENAME);
+                    if(is_array($arrayFile)) self::$configArray[$file] = $arrayFile;
                 }
 
             }
@@ -81,9 +83,21 @@ class Conf
             if(pathinfo($path, PATHINFO_EXTENSION) == "php")
             {
                 $arrayFile = require $path;
-                if(is_array($arrayFile)) self::$config = array_merge(self::$config, $arrayFile);
+                $path = pathinfo($path, PATHINFO_FILENAME);
+                if(is_array($arrayFile)) self::$configArray[$path] = $arrayFile;
             }
         }
+    }
+
+    /**
+     *
+     */
+    public static function __callStatic($name, $params)
+    {
+        if(!array_key_exists($name, self::$configArray))
+            throw new Exception(" $name config method doesn't exists", 4);
+
+        return self::get($name, ...$params);
     }
 
     /**
@@ -92,28 +106,53 @@ class Conf
      * @param  string $key
      * @return mixed
      */
-    public static function get(string $key, $value = NULL)
+    public static function get(string $config, string $key, $value = NULL)
     {
         if(is_null($value))
         {
-            if(!self::exists($key))
-            throw new \Exception("$key doesn't exists", 1);
+            if(!array_key_exists($key, self::$configArray[$config]))
+                throw new ConfigException("config key $key doesn't exist", 4);
 
-            return self::$config[$key];
+            return self::$configArray[$config][$key];
         }
 
-        return self::$config[$key] = $value;
+        return self::$configArray[$config][$key] = $value;
     }
 
     /**
-     * check if config exists
+     * add to an array
+     * add arrays or string values
+     */
+    public static function append(string $config, string $key, $value)
+    {
+        if(!array_key_exists($config, self::$configArray))
+                throw new ConfigException("config key $config doesn't exist", 4);
+
+        if(is_string(self::$configArray[$config][$key])) // if string
+        {
+            self::$configArray[$config][$key] = array(
+                self::$configArray[$config][$key],
+            );
+        }
+
+        if(is_array($value))
+        {
+            return self::$configArray[$config][$key] = array_merge( self::$configArray[$config][$key], $value);
+        }
+
+        return self::$configArray[$config][$key][] = $value;
+    }
+
+
+    /*
+     * TODO refactor this
      *
      * @param  string $key
      * @return boolean
-     */
+     *
     public static function exists(string $key) : bool
     {
         return array_key_exists($key, self::$config);
-    }
+    }*/
 }
 
