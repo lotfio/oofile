@@ -128,6 +128,9 @@ class Conf
         if(!array_key_exists($config, self::$configArray))
                 throw new ConfigException("config key $config doesn't exist", 4);
 
+        if(!array_key_exists($key, self::$configArray[$config])) // if key doesn't exists add it and append to it
+            self::$configArray[$config][$key] = array();
+
         if(is_string(self::$configArray[$config][$key])) // if string
         {
             self::$configArray[$config][$key] = array(
