@@ -29,11 +29,8 @@
  * SOFTWARE.
  */
 
-use OoFile\Exceptions\FileNameException; //1
-use OoFile\Exceptions\FileModeException; //2
+use OoFile\Exceptions\ConfigException;
 use OoFile\Exceptions\FileNotFoundException; //3
-use OoFile\Exceptions\FilePermissionsException; //4
-use OoFile\Exceptions\DirectoryNotFoundException; //5
 
 class DotConf
 {
@@ -103,5 +100,40 @@ class DotConf
         }
 
         return $confStr;
+    }
+
+    /**
+     * read from .conf
+     *
+     * @param string $key
+     * @return string
+     */
+    public static function read(string $key) : string
+    {
+        $from    = (strpos(__DIR__, 'vendor') != 0) ? 'vendor' : 'src';
+        $path    = explode($from, __DIR__)[0];
+        $dotConf = $path . '.conf';
+
+        if(!file_exists($dotConf))
+            throw new FileNotFoundException(".conf file not found", 4);
+        
+        $confArray = array();
+        
+        $handle = fopen($dotConf,'r');
+        while(!feof($handle))
+        {
+            $line = fgets($handle);
+            if(preg_match("/(.*)+\:{1}(.*)+/", $line))
+            {
+                $conf = explode(":", $line);
+                $confArray[trim($conf[0])] = trim($conf[1]);
+            }
+
+        }
+        
+        if(!array_key_exists($key, $confArray))
+            throw new ConfigException("$key not found in .conf file", 4);
+        
+        return $confArray[$key];
     }
 }

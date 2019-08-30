@@ -29,12 +29,12 @@
  * SOFTWARE.
  */
 
-use OoFile\Conf;
+use OoFile\DotConf;
 
 if(!function_exists("conf"))
 {
-    function conf($key, $value = NULL)
+    function conf($key)
     {
-        return Conf::get($key, $value);
+        return DotConf::read($key);
     }
 }
