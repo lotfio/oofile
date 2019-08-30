@@ -29,7 +29,6 @@
  * SOFTWARE.
  */
 
-use Exception;
 use OoFile\Exceptions\FileNameException; //1
 use OoFile\Exceptions\FileNotFoundException; //3
 use OoFile\Exceptions\ConfigException; //3
