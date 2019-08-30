@@ -1,5 +1,3 @@
-# OoFile
-
 <p align="center">
   <img src="https://user-images.githubusercontent.com/18489496/64043047-a01d8200-cb63-11e9-86e3-6a9e4ee374b3.png">
 </p>
@@ -9,6 +7,7 @@
   <img src="https://img.shields.io/badge/PHP-7.3-green.svg">
   <img src="https://img.shields.io/badge/Version-0.1.0-f53b57.svg">
   <img src="https://img.shields.io/badge/coverage-50%25-blue.svg">
+  <img src="https://travis-ci.org/lotfio/oofile.svg?branch=master">
  </p>
 
 ## About OoFile package :
