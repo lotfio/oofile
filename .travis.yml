@@ -1,0 +1,14 @@
+branches:
+  only:
+    - master
+
+language: php
+
+php:
+  - 7.2
+  - 7.3
+
+before_script:
+    - composer install
+
+script: vendor/bin/phpunit
