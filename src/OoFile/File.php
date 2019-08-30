@@ -38,17 +38,17 @@ use OoFile\Exceptions\DirectoryNotFoundException; //5
 class File
 {
     /**
-     * file mods
+     * file modes
      *
-     * @var $mods array
+     * @var $modes array
      */
-    private $mods = array(
+    private $modes = array(
         "r","r+",
         "w","w+",
         "a","a+",
         "x","x+",
         "c","c+",
-        "e",
+        "e"
     );
 
     /**
@@ -65,14 +65,29 @@ class File
         if(!is_string($file) || is_dir($file))
             throw new FileNameException("please provide valid filename string", 1);
 
-        if(!is_writable(getcwd()))
-            throw new FilePermissionsException("you don't have permissions to create a file in this dir", 4);
-
-        if(!in_array($mode, $this->mods))
+        if(!in_array($mode, $this->modes))
             throw new FileModeException("$mode file mode not supported", 2);
 
-        fopen($file, $mode);
+        $handle = fopen($file, $mode);
+        fclose($handle);
         return file_exists($file);
+    }
+
+    /**
+     * write to a file
+     *
+     * @param string $file
+     * @param string $content
+     * @return void
+     */
+    public function write(string $file, string $content)
+    {
+        if(!file_exists($file))
+            throw new NotFoundException("file $file not found", 4);
+
+        $handle = fopen($file, 'r+'); 
+        fwrite($handle, $content);
+        return fclose($handle);
     }
 
     /**

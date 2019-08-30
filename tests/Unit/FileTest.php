@@ -83,6 +83,13 @@ class FileTest extends TestCase
         $this->assertIsInt($size);
     }
 
+   public function testWriteMethod()
+    {
+        $this->file->write('tests/temp/temp2/test2.txt', "123456789+");
+        $size = $this->file->size('tests/temp/temp2/test2.txt');
+        $this->assertEquals(10, $size);
+    }
+
     public function testDeleteNotExistsFile()
     {
         $this->expectException(FileNotFoundException::class);
