@@ -1,6 +1,8 @@
-<?php namespace OoFile;
+<?php
 
-/**
+namespace OoFile;
+
+/*
  * OoFile       PHP file manipulation package
  *
  * @author      Lotfio Lakehal <contact@lotfio.net>
@@ -29,68 +31,67 @@
  * SOFTWARE.
  */
 
-use OoFile\Exceptions\FileNameException; //1
+use OoFile\Exceptions\ConfigException; //1
+use OoFile\Exceptions\FileNameException; //3
 use OoFile\Exceptions\FileNotFoundException; //3
-use OoFile\Exceptions\ConfigException; //3
 
 class Conf
 {
     /**
      * config array
-     * all config arrays should be merged to this array
+     * all config arrays should be merged to this array.
      *
      * @var array
      */
-    public static $configArray = array(
+    public static $configArray = [
 
-    );
+    ];
 
     /**
-     * add to config array
+     * add to config array.
      *
      * @param string $path
+     *
      * @return void
      */
     public static function add(string $path)
     {
-
-        if(!is_dir($path) && !is_file($path)) throw new FileNameException("wrong file or directory path", 1);
-
-        if(is_dir($path))
-        {
-
-            $files = array_filter(scandir($path), function($item) use ($path) {
-                return !is_dir($path . $item);
+        if (!is_dir($path) && !is_file($path)) {
+            throw new FileNameException('wrong file or directory path', 1);
+        }
+        if (is_dir($path)) {
+            $files = array_filter(scandir($path), function ($item) use ($path) {
+                return !is_dir($path.$item);
             });
 
-            foreach($files as $file)
-            {
-                if(pathinfo($file, PATHINFO_EXTENSION) == "php") // if php file
-                {
-                    if(!file_exists($path . DIRECTORY_SEPARATOR . $file)) throw new FileNotFoundException("cannot find file please provide an absolute path", 3);
-                    $arrayFile = require $path . DIRECTORY_SEPARATOR . $file;
+            foreach ($files as $file) {
+                if (pathinfo($file, PATHINFO_EXTENSION) == 'php') { // if php file
+                    if (!file_exists($path.DIRECTORY_SEPARATOR.$file)) {
+                        throw new FileNotFoundException('cannot find file please provide an absolute path', 3);
+                    }
+                    $arrayFile = require $path.DIRECTORY_SEPARATOR.$file;
 
                     $file = pathinfo($file, PATHINFO_FILENAME);
-                    if(is_array($arrayFile)) self::$configArray[$file] = $arrayFile;
+                    if (is_array($arrayFile)) {
+                        self::$configArray[$file] = $arrayFile;
+                    }
                 }
-
             }
         }
 
-        if(is_file($path))
-        {
-            if(pathinfo($path, PATHINFO_EXTENSION) == "php")
-            {
+        if (is_file($path)) {
+            if (pathinfo($path, PATHINFO_EXTENSION) == 'php') {
                 $arrayFile = require $path;
                 $path = pathinfo($path, PATHINFO_FILENAME);
-                if(is_array($arrayFile)) self::$configArray[$path] = $arrayFile;
+                if (is_array($arrayFile)) {
+                    self::$configArray[$path] = $arrayFile;
+                }
             }
         }
     }
 
     /**
-     * static call for config
-     * 
+     * static call for config.
      */
     public static function __callStatic($name, $params)
     {
@@ -98,20 +99,21 @@ class Conf
     }
 
     /**
-     * get config from array
+     * get config from array.
      *
-     * @param  string $key
+     * @param string $key
+     *
      * @return mixed
      */
-    public static function get(string $config, string $key, $value = NULL)
+    public static function get(string $config, string $key, $value = null)
     {
-        if(!array_key_exists($config, self::$configArray))
+        if (!array_key_exists($config, self::$configArray)) {
             throw new ConfigException(" $config config method doesn't exists", 4);
-
-        if(is_null($value))
-        {
-            if(!array_key_exists($key, self::$configArray[$config]))
+        }
+        if (is_null($value)) {
+            if (!array_key_exists($key, self::$configArray[$config])) {
                 throw new ConfigException("config key $key doesn't exist", 4);
+            }
 
             return self::$configArray[$config][$key];
         }
@@ -121,33 +123,32 @@ class Conf
 
     /**
      * add to an array
-     * add arrays or string values
+     * add arrays or string values.
      */
-    public static function append(string $config, string $key, $value = NULL)
+    public static function append(string $config, string $key, $value = null)
     {
-        if(!array_key_exists($config, self::$configArray))
-                throw new ConfigException("config key $config doesn't exist", 4);
-
-        if(!array_key_exists($key, self::$configArray[$config])) // if key doesn't exists add it and append to it
-            self::$configArray[$config][$key] = array();
-
-        if(is_string(self::$configArray[$config][$key])) // if string
-        {
-            self::$configArray[$config][$key] = array(
-                self::$configArray[$config][$key],
-            );
+        if (!array_key_exists($config, self::$configArray)) {
+            throw new ConfigException("config key $config doesn't exist", 4);
+        }
+        if (!array_key_exists($key, self::$configArray[$config])) { // if key doesn't exists add it and append to it
+            self::$configArray[$config][$key] = [];
         }
 
-        if(is_array($value))
-        {
-            return self::$configArray[$config][$key] = array_merge( self::$configArray[$config][$key], $value);
+        if (is_string(self::$configArray[$config][$key])) { // if string
+            self::$configArray[$config][$key] = [
+                self::$configArray[$config][$key],
+            ];
+        }
+
+        if (is_array($value)) {
+            return self::$configArray[$config][$key] = array_merge(self::$configArray[$config][$key], $value);
         }
 
         return self::$configArray[$config][$key][] = $value;
     }
 
     /**
-     * get all config method
+     * get all config method.
      *
      * @return array
      */
@@ -156,4 +157,3 @@ class Conf
         return self::$configArray;
     }
 }
-

@@ -1,12 +1,14 @@
-<?php namespace Tests\Unit;
+<?php
 
-use OoFile\File;
-use PHPUnit\Framework\TestCase;
+namespace Tests\Unit;
+
+use OoFile\Exceptions\DirectoryNotFoundException;
+use OoFile\Exceptions\FileModeException;
 use OoFile\Exceptions\FileNameException; //1
-use OoFile\Exceptions\FileModeException; //2
-use OoFile\Exceptions\FileNotFoundException; //3
-use OoFile\Exceptions\FilePermissionsException; //4
-use OoFile\Exceptions\DirectoryNotFoundException; //4
+use OoFile\Exceptions\FileNotFoundException; //2
+use OoFile\File; //3
+//4
+use PHPUnit\Framework\TestCase; //4
 
 class FileTest extends TestCase
 {
@@ -14,66 +16,66 @@ class FileTest extends TestCase
 
     public function setUp() : void
     {
-        $this->file = new File;
+        $this->file = new File();
     }
 
     public function testCreateMethodWithWrongName()
     {
         $this->expectException(FileNameException::class);
-        $this->file->create("tests/temp/");
+        $this->file->create('tests/temp/');
     }
 
     public function testCreateFileWithModeNotExist()
     {
         $this->expectException(FileModeException::class);
-        $create = $this->file->create("tests/temp/test.txt", "any");
+        $create = $this->file->create('tests/temp/test.txt', 'any');
     }
 
     public function testCreateFile()
     {
-        $create = $this->file->create("tests/temp/test.txt");
+        $create = $this->file->create('tests/temp/test.txt');
         $this->assertTrue($create);
     }
 
     public function testRenameFileNotExists()
     {
         $this->expectException(FileNotFoundException::class);
-        $rename = $this->file->rename("tests/temp/test5.txt", "tests/temp/test2.txt");
+        $rename = $this->file->rename('tests/temp/test5.txt', 'tests/temp/test2.txt');
     }
 
     public function testRenameFile()
     {
-        $rename = $this->file->rename("tests/temp/test.txt", "tests/temp/test2.txt");
+        $rename = $this->file->rename('tests/temp/test.txt', 'tests/temp/test2.txt');
         $this->assertTrue($rename);
     }
 
     public function testCopyFileNotExists()
     {
         $this->expectException(FileNotFoundException::class);
-        $rename = $this->file->copy("tests/temp/test5.txt", "tests/temp/test2.txt");
+        $rename = $this->file->copy('tests/temp/test5.txt', 'tests/temp/test2.txt');
     }
 
     public function testCopyFile()
     {
-        $copy = $this->file->copy("tests/temp/test2.txt", "tests/temp/test2-copy.txt");
+        $copy = $this->file->copy('tests/temp/test2.txt', 'tests/temp/test2-copy.txt');
         $this->assertTrue($copy);
     }
 
     public function testMoveFileNotExists()
     {
         $this->expectException(FileNotFoundException::class);
-        $move = $this->file->move("tests/temp/test5.txt", "tests/");
+        $move = $this->file->move('tests/temp/test5.txt', 'tests/');
     }
 
     public function testMoveFileNoDirectory()
     {
         $this->expectException(DirectoryNotFoundException::class);
-        $move = $this->file->move("tests/temp/test2.txt", "tests/wrongDir");
+        $move = $this->file->move('tests/temp/test2.txt', 'tests/wrongDir');
     }
 
     public function testMoveFile()
     {
-        $move = $this->file->move("tests/temp/test2.txt", "tests/temp/temp2/");
+        $move = $this->file->move('tests/temp/test2.txt', 'tests/temp/temp2/');
         $this->assertTrue($move);
     }
 
@@ -83,9 +85,9 @@ class FileTest extends TestCase
         $this->assertIsInt($size);
     }
 
-   public function testWriteMethod()
+    public function testWriteMethod()
     {
-        $this->file->write('tests/temp/temp2/test2.txt', "123456789+");
+        $this->file->write('tests/temp/temp2/test2.txt', '123456789+');
         $size = $this->file->size('tests/temp/temp2/test2.txt');
         $this->assertEquals(10, $size);
     }
@@ -93,13 +95,13 @@ class FileTest extends TestCase
     public function testDeleteNotExistsFile()
     {
         $this->expectException(FileNotFoundException::class);
-        $move = $this->file->delete("tests/temp/test5.txt");
+        $move = $this->file->delete('tests/temp/test5.txt');
     }
 
     public function testDeleteFile()
     {
-        $delete  = $this->file->delete("tests/temp/temp2/test2.txt");
-        $delete2 = $this->file->delete("tests/temp/test2-copy.txt");
+        $delete = $this->file->delete('tests/temp/temp2/test2.txt');
+        $delete2 = $this->file->delete('tests/temp/test2-copy.txt');
         $this->assertTrue($delete);
         $this->assertTrue($delete2);
     }
