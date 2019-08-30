@@ -7,6 +7,7 @@
   <img src="https://img.shields.io/badge/PHP-7.3-green.svg">
   <img src="https://img.shields.io/badge/Version-0.1.0-f53b57.svg">
   <img src="https://img.shields.io/badge/coverage-50%25-blue.svg">
+  <img src="https://github.styleci.io/repos/203562170/shield?branch=master">
   <img src="https://travis-ci.org/lotfio/oofile.svg?branch=master">
  </p>
 
