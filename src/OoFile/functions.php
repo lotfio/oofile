@@ -1,7 +1,7 @@
 <?php
 
 /**
- * OoFile       PHP file manipulation package
+ * OoFile       PHP file manipulation package.
  *
  * @author      Lotfio Lakehal <contact@lotfio.net>
  * @copyright   2019 Lotfio Lakehal
@@ -28,13 +28,11 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-
 use OoFile\DotEnv;
 
-if(!function_exists("env"))
-{
+if (!function_exists('env')) {
     function env($key)
     {
-        return DotEnv::read($key, $default = NULL);
+        return DotEnv::read($key, $default = null);
     }
 }

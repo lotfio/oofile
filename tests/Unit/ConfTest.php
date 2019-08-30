@@ -1,14 +1,16 @@
-<?php namespace Tests\Unit;
+<?php
+
+namespace Tests\Unit;
 
 use OoFile\Conf;
 use OoFile\Exceptions\ConfigException;
-use PHPUnit\Framework\TestCase;
-use OoFile\Exceptions\FileNameException; //1
+use OoFile\Exceptions\FileNameException;
+use PHPUnit\Framework\TestCase; //1
 
 class ConfTest extends TestCase
 {
     /**
-     * test add wrong dir to config
+     * test add wrong dir to config.
      *
      * @return void
      */
@@ -19,7 +21,7 @@ class ConfTest extends TestCase
     }
 
     /**
-     * test add wrong file to config
+     * test add wrong file to config.
      *
      * @return void
      */
@@ -30,7 +32,7 @@ class ConfTest extends TestCase
     }
 
     /**
-     * adding a directory of config files
+     * adding a directory of config files.
      *
      * @return void
      */
@@ -42,7 +44,7 @@ class ConfTest extends TestCase
     }
 
     /**
-     * adding only a file to the config
+     * adding only a file to the config.
      *
      * @return void
      */
@@ -54,7 +56,7 @@ class ConfTest extends TestCase
     }
 
     /**
-     * static call for non existing config file
+     * static call for non existing config file.
      *
      * @return void
      */
@@ -65,7 +67,7 @@ class ConfTest extends TestCase
     }
 
     /**
-     * test call non exiting config file
+     * test call non exiting config file.
      *
      * @return void
      */
@@ -76,7 +78,7 @@ class ConfTest extends TestCase
     }
 
     /**
-     * test call non exiting config key
+     * test call non exiting config key.
      *
      * @return void
      */
@@ -87,7 +89,7 @@ class ConfTest extends TestCase
     }
 
     /**
-     * test existing config and key
+     * test existing config and key.
      *
      * @return void
      */
@@ -98,7 +100,7 @@ class ConfTest extends TestCase
     }
 
     /**
-     * test call non exiting config file
+     * test call non exiting config file.
      *
      * @return void
      */
@@ -109,7 +111,7 @@ class ConfTest extends TestCase
     }
 
     /**
-     * test append to non exiting config file
+     * test append to non exiting config file.
      *
      * @return void
      */
@@ -122,18 +124,18 @@ class ConfTest extends TestCase
     /**
      * test append to non exiting key
      * should add an empty array which we can append to it later
-     * fist element will be empty since we are defaulting  value to null
+     * fist element will be empty since we are defaulting  value to null.
      *
      * @return void
      */
     public function testAppendMethodNonExistingValue()
     {
         Conf::append('app', 'test');
-        $this->assertIsArray(Conf::app("test"));
-        $this->assertNull(Conf::app("test")[0]);
+        $this->assertIsArray(Conf::app('test'));
+        $this->assertNull(Conf::app('test')[0]);
     }
 
-        /*
+    /*
      * test append to non exiting key
      * should add an empty arry which we can append to it later
      *
@@ -141,14 +143,14 @@ class ConfTest extends TestCase
      */
     public function testAppendMethodNonExistingKeyWithValue()
     {
-        Conf::append('app', 'test', "hello");
-        $this->assertIsArray(Conf::app("test"));
-        $this->assertSame('hello', Conf::app("test")[1]);
+        Conf::append('app', 'test', 'hello');
+        $this->assertIsArray(Conf::app('test'));
+        $this->assertSame('hello', Conf::app('test')[1]);
     }
 
     /**
-     * test append to exiting config  key 
-     * should append to the array
+     * test append to exiting config  key
+     * should append to the array.
      *
      * @return void
      */
@@ -159,19 +161,19 @@ class ConfTest extends TestCase
     }
 
     /**
-     * test append to exiting config  key 
-     * should append to the array
+     * test append to exiting config  key
+     * should append to the array.
      *
      * @return void
      */
     public function testAppendMethodAddArrayExistingKey()
     {
-        Conf::append('app', 'added_key', array("appended_array"));
+        Conf::append('app', 'added_key', ['appended_array']);
         $this->assertContains('appended_array', Conf::app('added_key'));
     }
 
     /**
-     * test all method
+     * test all method.
      *
      * @return void
      */
