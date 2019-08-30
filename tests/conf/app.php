@@ -1,5 +1,5 @@
 <?php
 
-return array(
-    "config_key" => "config_value"
-);
+return [
+    'config_key' => 'config_value',
+];

@@ -1,6 +1,8 @@
-<?php namespace OoFile;
+<?php
 
-/**
+namespace OoFile;
+
+/*
  * OoFile       PHP file manipulation package
  *
  * @author      Lotfio Lakehal <contact@lotfio.net>
@@ -29,136 +31,149 @@
  * SOFTWARE.
  */
 
-use OoFile\Exceptions\FileNameException; //1
+use OoFile\Exceptions\DirectoryNotFoundException; //1
 use OoFile\Exceptions\FileModeException; //2
-use OoFile\Exceptions\FileNotFoundException; //3
-use OoFile\Exceptions\FilePermissionsException; //4
-use OoFile\Exceptions\DirectoryNotFoundException; //5
+use OoFile\Exceptions\FileNameException; //3
+//4
+use OoFile\Exceptions\FileNotFoundException; //5
 
 class File
 {
     /**
-     * file modes
+     * file modes.
      *
-     * @var $modes array
+     * @var array
      */
-    private $modes = array(
-        "r","r+",
-        "w","w+",
-        "a","a+",
-        "x","x+",
-        "c","c+",
-        "e"
-    );
+    private $modes = [
+        'r', 'r+',
+        'w', 'w+',
+        'a', 'a+',
+        'x', 'x+',
+        'c', 'c+',
+        'e',
+    ];
 
     /**
-     * create a file
+     * create a file.
      *
      * @method create
-     * @param  string $file
-     * @param  string $mode
+     *
+     * @param string $file
+     * @param string $mode
+     *
      * @throws Exception
+     *
      * @return bool
      */
-    public function create(string $file, string $mode = "w+") : bool
+    public function create(string $file, string $mode = 'w+') : bool
     {
-        if(!is_string($file) || is_dir($file))
-            throw new FileNameException("please provide valid filename string", 1);
-
-        if(!in_array($mode, $this->modes))
+        if (!is_string($file) || is_dir($file)) {
+            throw new FileNameException('please provide valid filename string', 1);
+        }
+        if (!in_array($mode, $this->modes)) {
             throw new FileModeException("$mode file mode not supported", 2);
-
+        }
         $handle = fopen($file, $mode);
         fclose($handle);
+
         return file_exists($file);
     }
 
     /**
-     * write to a file
+     * write to a file.
      *
      * @param string $file
      * @param string $content
+     *
      * @return void
      */
     public function write(string $file, string $content)
     {
-        if(!file_exists($file))
+        if (!file_exists($file)) {
             throw new NotFoundException("file $file not found", 4);
-
-        $handle = fopen($file, 'r+'); 
+        }
+        $handle = fopen($file, 'r+');
         fwrite($handle, $content);
+
         return fclose($handle);
     }
 
     /**
-     * get file size
+     * get file size.
      *
      * @param string $file
-     * @return integer
+     *
+     * @return int
      */
     public function size(string $file) : int
     {
-        if(!file_exists($file))
+        if (!file_exists($file)) {
             throw new NotFoundException("file $file not found", 4);
-            
+        }
+
         return filesize($file);
     }
 
     /**
-     * rename file method
+     * rename file method.
      *
-     * @param  string $old old file name
-     * @param  string $new new file name
+     * @param string $old old file name
+     * @param string $new new file name
+     *
      * @return bool
      */
     public function rename(string $old, string $new) : bool
     {
-        if(!is_string($old) || !is_string($new))
-            throw new FileNameException("old and new file names must be valid strings", 1);
-
-        if(!file_exists($old))
+        if (!is_string($old) || !is_string($new)) {
+            throw new FileNameException('old and new file names must be valid strings', 1);
+        }
+        if (!file_exists($old)) {
             throw new FileNotFoundException("file $old not found", 3);
+        }
 
         return rename($old, $new);
     }
 
     /**
-     * copy file method
+     * copy file method.
      *
-     * @param  string $old old file name
-     * @param  string $new new file name
+     * @param string $old old file name
+     * @param string $new new file name
+     *
      * @return bool
      */
     public function copy(string $old, string $new) : bool
     {
-        if(!is_string($old) || !is_string($new) || is_dir($old) || is_dir($new))
-            throw new FileNameException("old and new file names must be valid strings", 1);
-
-        if(!file_exists($old))
+        if (!is_string($old) || !is_string($new) || is_dir($old) || is_dir($new)) {
+            throw new FileNameException('old and new file names must be valid strings', 1);
+        }
+        if (!file_exists($old)) {
             throw new FileNotFoundException("file $old not found", 3);
+        }
 
         return copy($old, $new);
     }
 
     /**
-     * move file method
+     * move file method.
      *
-     * @param  string $old old file name
-     * @param  string $new new file name
+     * @param string $old old file name
+     * @param string $new new file name
+     *
      * @return bool
      */
     public function move(string $file, string $destination) : bool
     {
-        if(!is_string($file) || !is_string($destination))
+        if (!is_string($file) || !is_string($destination)) {
             throw new FileNameException("file name $file and destination $destination must be valid strings", 1);
-
-        if(!file_exists($file))
+        }
+        if (!file_exists($file)) {
             throw new FileNotFoundException("file $file not found", 4);
-
-        if(!is_dir($destination))
+        }
+        if (!is_dir($destination)) {
             throw new DirectoryNotFoundException("destination $destination doesn't seem to be a valid directory", 4);
-
-        $destination = trim($destination, "/") . DIRECTORY_SEPARATOR . pathinfo($file, PATHINFO_FILENAME) .".". pathinfo($file, PATHINFO_EXTENSION);
+        }
+        $destination = trim($destination, '/').DIRECTORY_SEPARATOR.pathinfo($file, PATHINFO_FILENAME).'.'.pathinfo($file, PATHINFO_EXTENSION);
 
         copy($file, $destination);
 
@@ -166,19 +181,21 @@ class File
     }
 
     /**
-     * copy file method
+     * copy file method.
      *
-     * @param  string $old old file name
-     * @param  string $new new file name
+     * @param string $old old file name
+     * @param string $new new file name
+     *
      * @return bool
      */
     public function delete(string $file) : bool
     {
-        if(!is_string($file))
+        if (!is_string($file)) {
             throw new FileNameException("file name $file must be valid string", 1);
-
-        if(!file_exists($file))
+        }
+        if (!file_exists($file)) {
             throw new FileNotFoundException("file $file not found", 4);
+        }
 
         return unlink($file);
     }
