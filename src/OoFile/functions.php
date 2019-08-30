@@ -29,12 +29,12 @@
  * SOFTWARE.
  */
 
-use OoFile\DotConf;
+use OoFile\DotEnv;
 
-if(!function_exists("conf"))
+if(!function_exists("env"))
 {
-    function conf($key)
+    function env($key)
     {
-        return DotConf::read($key);
+        return DotEnv::read($key, $default = NULL);
     }
 }

@@ -30,16 +30,17 @@
  */
 
 use OoFile\Exceptions\ConfigException;
+use OoFile\Exceptions\DirectoryException;
 use OoFile\Exceptions\FileNotFoundException; //3
 
-class DotConf
+class DotEnv
 {
     /**
-     * default config array
+     * default env array
      *
      * @var array
      */
-    public $defaultConf = array(
+    private $defaultEnv = array(
         "APP_NAME"      => "Silo",
         "APP_ENV"       => "dev",
         "APP_KEY"       => "",
@@ -58,82 +59,104 @@ class DotConf
     );
 
     /**
-     * initialize config file
-     *
+     * initialize env file
+     * @param $envArray env variables to be added or modified
+     * @param &$path reference to where env file is created
+     * 
      * @return void
      */
-    public function init(array $config = array())
+    public function init(array $envArray = array(), &$path = NULL)
     {
         $from    = (strpos(__DIR__, 'vendor') != 0) ? 'vendor' : 'src';
         $path    = explode($from, __DIR__)[0];
-        $dotConf = $path . '.conf';
+        $dotEnv  = $path . '.env';
 
-        $conf = (new File);
-        $conf->create($dotConf);
+        $file = (new File);
+        $file->create($dotEnv);
 
-        $confArray = empty($config) ? $this->defaultConf : $config;
+        $envArray = array_merge($this->defaultEnv, $envArray);
 
-        return $conf->write($dotConf, $this->buildConfString($confArray));
+        return $file->write($dotEnv, $this->buildEnvString($envArray));
     }
 
     /**
-     * build a config string from array
+     * build a env string from array
      *
-     * @param array $confArray
+     * @param array $envArray
      * @return string
      */
-    public function buildConfString(array $confArray) : string
+    private function buildEnvString(array $envArray) : string
     {
-        $confStr = '';
+        $envStr = '';
 
-        $lengths = array_map('strlen', array_keys($confArray));
+        $lengths = array_map('strlen', array_keys($envArray));
         $max     = max($lengths);
         
-        foreach($confArray as $key => $value)
+        foreach($envArray as $key => $value)
         {
             if($value == 'SEPARATOR')
             {
-                $confStr .= "\n";
+                $envStr .= "\n";
                 continue;
             }
-            $confStr .= $key . str_repeat(' ', ($max - strlen($key))) . ' : ' . $value . "\n";
+            $envStr .= $key . str_repeat(' ', ($max - strlen($key))) . ' : ' . $value . "\n";
         }
 
-        return $confStr;
+        return $envStr;
     }
 
     /**
-     * read from .conf
+     * read from .env
      *
      * @param string $key
      * @return string
      */
-    public static function read(string $key) : string
+    public static function read(string $key, $default = NULL)
     {
         $from    = (strpos(__DIR__, 'vendor') != 0) ? 'vendor' : 'src';
         $path    = explode($from, __DIR__)[0];
-        $dotConf = $path . '.conf';
+        $dotEnv  = $path . '.env';
 
-        if(!file_exists($dotConf))
-            throw new FileNotFoundException(".conf file not found", 4);
+        if(!file_exists($dotEnv))
+            throw new FileNotFoundException(".env file not found", 4);
         
-        $confArray = array();
+        $envArray = array();
         
-        $handle = fopen($dotConf,'r');
+        $handle = fopen($dotEnv,'r');
         while(!feof($handle))
         {
             $line = fgets($handle);
-            if(preg_match("/(.*)+\:{1}(.*)+/", $line))
+            if(preg_match("/[\w\s]+:{1}[\w\s]+/", $line))
             {
-                $conf = explode(":", $line);
-                $confArray[trim($conf[0])] = trim($conf[1]);
+                $env = explode(":", $line);
+                $envArray[trim($env[0])] = trim($env[1]);
             }
-
         }
         
-        if(!array_key_exists($key, $confArray))
-            throw new ConfigException("$key not found in .conf file", 4);
+        if(!array_key_exists($key, $envArray) || strlen($envArray[$key]) == 0)
+            return $envArray[$key] = $default;
         
-        return $confArray[$key];
+        return $envArray[$key];
+    }
+
+    /**
+     * delete dot env file
+     * @param &$path reference from where .env file as deleted 
+     * 
+     * @return void
+     */
+    public function deleteEnvFile(&$path = NULL)
+    {
+        $from    = (strpos(__DIR__, 'vendor') != 0) ? 'vendor' : 'src';
+        $path    = explode($from, __DIR__)[0];
+        $dotEnv  = $path . '.env';
+
+        if(!file_exists($dotEnv))
+            throw new FileNotFoundException("$dotEnv file not found");
+        
+        if(!is_writable($path))
+            throw new DirectoryException("can not delete .env file $path is not writable");
+        
+        return unlink($dotEnv);
     }
 }

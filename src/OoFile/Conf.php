@@ -155,15 +155,5 @@ class Conf
     {
         return self::$configArray;
     }
-    /*
-     * TODO refactor this
-     *
-     * @param  string $key
-     * @return boolean
-     *
-    public static function exists(string $key) : bool
-    {
-        return array_key_exists($key, self::$config);
-    }*/
 }
 

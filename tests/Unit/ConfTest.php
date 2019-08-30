@@ -170,6 +170,11 @@ class ConfTest extends TestCase
         $this->assertContains('appended_array', Conf::app('added_key'));
     }
 
+    /**
+     * test all method
+     *
+     * @return void
+     */
     public function testConfAllMethodIsValidConfigArray()
     {
         $this->assertIsArray(Conf::all());
