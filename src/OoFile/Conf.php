@@ -68,7 +68,7 @@ class Conf
             {
                 if(pathinfo($file, PATHINFO_EXTENSION) == "php") // if php file
                 {
-                    if(!file_exists($path . DIRECTORY_SEPARATOR . $file)) throw new FileNotFoundException("cannot find file pelase provide an absolute path", 3);
+                    if(!file_exists($path . DIRECTORY_SEPARATOR . $file)) throw new FileNotFoundException("cannot find file please provide an absolute path", 3);
                     $arrayFile = require $path . DIRECTORY_SEPARATOR . $file;
 
                     $file = pathinfo($file, PATHINFO_FILENAME);
@@ -90,13 +90,11 @@ class Conf
     }
 
     /**
-     *
+     * static call for config
+     * 
      */
     public static function __callStatic($name, $params)
     {
-        if(!array_key_exists($name, self::$configArray))
-            throw new Exception(" $name config method doesn't exists", 4);
-
         return self::get($name, ...$params);
     }
 
@@ -108,6 +106,9 @@ class Conf
      */
     public static function get(string $config, string $key, $value = NULL)
     {
+        if(!array_key_exists($config, self::$configArray))
+            throw new ConfigException(" $config config method doesn't exists", 4);
+
         if(is_null($value))
         {
             if(!array_key_exists($key, self::$configArray[$config]))
@@ -123,7 +124,7 @@ class Conf
      * add to an array
      * add arrays or string values
      */
-    public static function append(string $config, string $key, $value)
+    public static function append(string $config, string $key, $value = NULL)
     {
         if(!array_key_exists($config, self::$configArray))
                 throw new ConfigException("config key $config doesn't exist", 4);
@@ -146,7 +147,15 @@ class Conf
         return self::$configArray[$config][$key][] = $value;
     }
 
-
+    /**
+     * get all config method
+     *
+     * @return array
+     */
+    public static function all() : array
+    {
+        return self::$configArray;
+    }
     /*
      * TODO refactor this
      *
