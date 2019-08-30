@@ -76,6 +76,20 @@ class File
     }
 
     /**
+     * get file size
+     *
+     * @param string $file
+     * @return integer
+     */
+    public function size(string $file) : int
+    {
+        if(!file_exists($file))
+            throw new NotFoundException("file $file not found", 4);
+            
+        return filesize($file);
+    }
+
+    /**
      * rename file method
      *
      * @param  string $old old file name
@@ -121,7 +135,7 @@ class File
     public function move(string $file, string $destination) : bool
     {
         if(!is_string($file) || !is_string($destination))
-            throw new FileNameException("file name $file and distination $destination must be valid strings", 1);
+            throw new FileNameException("file name $file and destination $destination must be valid strings", 1);
 
         if(!file_exists($file))
             throw new FileNotFoundException("file $file not found", 4);

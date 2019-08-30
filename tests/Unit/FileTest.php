@@ -59,22 +59,28 @@ class FileTest extends TestCase
         $this->assertTrue($copy);
     }
 
-    public function testmoveFileNotExists()
+    public function testMoveFileNotExists()
     {
         $this->expectException(FileNotFoundException::class);
         $move = $this->file->move("tests/temp/test5.txt", "tests/");
     }
 
-    public function testmoveFileNoDirectory()
+    public function testMoveFileNoDirectory()
     {
         $this->expectException(DirectoryNotFoundException::class);
         $move = $this->file->move("tests/temp/test2.txt", "tests/wrongDir");
     }
 
-    public function testmoveFile()
+    public function testMoveFile()
     {
         $move = $this->file->move("tests/temp/test2.txt", "tests/temp/temp2/");
         $this->assertTrue($move);
+    }
+
+    public function testFileSizeMethod()
+    {
+        $size = $this->file->size('tests/temp/temp2/test2.txt');
+        $this->assertIsInt($size);
     }
 
     public function testDeleteNotExistsFile()
