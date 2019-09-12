@@ -4,6 +4,7 @@ namespace Tests\Unit;
 
 use OoFile\DotEnv;
 use PHPUnit\Framework\TestCase;
+
 //1
 
 class DotEnvTest extends TestCase
@@ -32,7 +33,7 @@ class DotEnvTest extends TestCase
     {
         $path = '';
         $this->env->init([
-            "APP_NAME" => "test"
+            'APP_NAME' => 'test',
         ], $path);
         $this->assertFileExists($path.'.env');
     }
