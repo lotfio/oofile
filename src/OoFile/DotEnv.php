@@ -37,29 +37,6 @@ use OoFile\Exceptions\FileNotFoundException; //3
 class DotEnv
 {
     /**
-     * default env array.
-     *
-     * @var array
-     */
-    private $defaultEnv = [
-        'APP_NAME'      => 'Silo',
-        'APP_ENV'       => 'dev',
-        'APP_KEY'       => '',
-        'APP_DEBUG'     => 'true',
-        'APP_URL'       => 'http://localhost',
-        '1'             => 'SEPARATOR',
-        'LOG'           => 'true',
-        'LOG_CHANNEL'   => 'mlm',
-        '2'             => 'SEPARATOR',
-        'DB_DRIVER'     => 'mysqli',
-        'DB_HOST'       => '127.0.0.1',
-        'DB_PORT'       => '3306',
-        'DB_NAME'       => 'silo',
-        'DB_USER'       => 'root',
-        'DB_PASS'       => '',
-    ];
-
-    /**
      * initialize env file.
      *
      * @param $envArray env variables to be added or modified
@@ -75,8 +52,6 @@ class DotEnv
 
         $file = (new File());
         $file->create($dotEnv);
-
-        $envArray = array_merge($this->defaultEnv, $envArray);
 
         return $file->write($dotEnv, $this->buildEnvString($envArray));
     }
