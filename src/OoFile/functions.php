@@ -31,7 +31,7 @@
 use OoFile\DotEnv;
 
 if (!function_exists('env')) {
-    function env($key, $default = NULL)
+    function env($key, $default = null)
     {
         return DotEnv::read($key, $default);
     }
