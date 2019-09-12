@@ -31,7 +31,9 @@ class DotEnvTest extends TestCase
     public function testInitializeDotEnvFile()
     {
         $path = '';
-        $this->env->init([], $path);
+        $this->env->init([
+            "APP_NAME" => "test"
+        ], $path);
         $this->assertFileExists($path.'.env');
     }
 
@@ -43,7 +45,7 @@ class DotEnvTest extends TestCase
     public function testReadKeyFromEnvFile()
     {
         $v = $this->env->read('APP_NAME');
-        $this->assertEquals('Silo', $v);
+        $this->assertEquals('test', $v);
     }
 
     /**
