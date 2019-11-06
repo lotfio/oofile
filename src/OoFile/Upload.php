@@ -139,7 +139,7 @@ class Upload
         $this->type         = $_FILES[$filename]['type'];
         $this->size         = $_FILES[$filename]['size'];
         $this->error        = $_FILES[$filename]['error'];
-        $this->destination  = rtrim(rtrim($destination, '\\'),'/') .'/';
+        $this->destination  = rtrim(rtrim($destination, '\\'),'/') . DIRECTORY_SEPARATOR;
     }
 
     /**
@@ -205,22 +205,23 @@ class Upload
 
         // validate no errors
         if($this->error != 0)
-            $this->validationErrors['errors'] =  $this->error;
+            $this->validationErrors['error'] =  $this->errorTypes($this->error);
 
-        if($this->isUnique == 'strict') // validate unique file content size and name
+        // validate unique file content size and name
+        if($this->isUnique == 'strict')
         {
-            $file = rtrim(rtrim($this->destination,'\\'), '/') . '/' . $this->upName;
+            $file = $this->destination . $this->upName;
             if(file_exists($file))
-                $this->validationErrors['name'] =  'file already exists';
-
-            if(sha1_file($file) == sha1_file($this->tempName) && filesize($file) == filesize($this->tempName))
-                $this->validationErrors['name'] =  'file size already exists';
-
+            {
+                if(sha1_file($file) == sha1_file($this->tempName) && filesize($file) == filesize($this->tempName))
+                $this->validationErrors['name'] =  'file already exists (same size and content)';
+            }
         }
 
+        // validate unique file content size and name
         if($this->isUnique == 'name') // validate only unique name
         {
-            $file = rtrim(rtrim($this->destination,'\\'), '/') . '/' . $this->upName;
+            $file = $this->destination . $this->upName;
             if(file_exists($file))
                 $this->validationErrors['name'] =  'file name already exists';
         }
@@ -229,6 +230,43 @@ class Upload
             return TRUE;
 
         return FALSE;
+    }
+
+    /**
+     * upload error types
+     *
+     * @param  integer $code
+     * @return string
+     */
+    public function errorTypes(int $code) : string
+    {
+        switch ($code) {
+            case UPLOAD_ERR_INI_SIZE:
+                $message = "The uploaded file exceeds the upload_max_filesize directive in php.ini";
+                break;
+            case UPLOAD_ERR_FORM_SIZE:
+                $message = "The uploaded file exceeds the MAX_FILE_SIZE directive that was specified in the HTML form";
+                break;
+            case UPLOAD_ERR_PARTIAL:
+                $message = "The uploaded file was only partially uploaded";
+                break;
+            case UPLOAD_ERR_NO_FILE:
+                $message = "No file was uploaded";
+                break;
+            case UPLOAD_ERR_NO_TMP_DIR:
+                $message = "Missing a temporary folder";
+                break;
+            case UPLOAD_ERR_CANT_WRITE:
+                $message = "Failed to write file to disk";
+                break;
+            case UPLOAD_ERR_EXTENSION:
+                $message = "File upload stopped by extension";
+                break;
+            default:
+                $message = "Unknown upload error";
+                break;
+        }
+        return $message;
     }
 
     /**
@@ -263,6 +301,10 @@ class Upload
      */
     public function proceed() : bool
     {
+        // if not unique allow duplicate with new name
+        if($this->isUnique === FALSE)
+            $this->upName = SHA1(bin2hex(random_bytes(10)) . substr(uniqid(), -7, 5) . $this->upName) . '.' . $this->extension;
+
         return move_uploaded_file($this->tempName, $this->destination . $this->upName);
     }
 }
