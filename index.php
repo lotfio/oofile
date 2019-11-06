@@ -5,37 +5,54 @@ use OoFile\Upload;
 
 require 'vendor/autoload.php';
 
-$_FILES['login']['name']        = 'cities.txt';
-$_FILES['login']['tmp_name']    = 'C:\Users\P3\Desktop\ALG\cities.txt';
-$_FILES['login']['size']        = '50000';
-$_FILES['login']['type']        = 'plain/text';
-$_FILES['login']['errors']      = 0;
 
+if($_SERVER['REQUEST_METHOD'] == 'POST')
+{
+    $destination = __DIR__;
+    // set upload file
+    $up = new Upload('image', $destination);
+print_r($_FILES);
+    // set max size
+    // 1 = 1MB
+    echo '<pre>';
+    $up->setMaxSize(5)
+    ->addAllowedTypes([
+        'txt', 'text/plain'
+    ]);
 
-$filename = "login";
+    //$up->resetAllowedTypes(array('pdf'));
 
-// set upload file
-$up = new Upload($filename);
+    //$up->unique(TRUE); // do not upload if already exists
 
-// set max size
-// 1 = 1MB
-echo '<pre>';
-$up->setMaxSize(5)
-->addAllowedTypes([
-    'txt', 'plain/text'
-]);
+    echo '<pre>';
 
-//$up->resetAllowedTypes(array('pdf'));
+    echo '<pre>';
 
-// $up->unique(); // override if name already exists
+    if($up->isValid()):
+        $up->proceed();
+        echo 'yeah uploaded !';
+    else:
+        print_r($up->errors());
+    endif;
+}
+?>
 
-echo '<pre>';
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+<body>
 
-echo '<pre>';
+<form action="" method="POST" enctype="multipart/form-data">
 
-if($up->isValid()):
-    $up->moveTo(__DIR__);
-    echo 'yeah uploaded !';
-else:
-    print_r($up->errors());
-endif;
+    <input type="file" name="image">
+
+    <input type="submit" value="upload">
+</form>
+
+</body>
+</html>

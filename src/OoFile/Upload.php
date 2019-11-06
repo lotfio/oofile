@@ -33,10 +33,10 @@ namespace OoFile;
 
 use OoFile\Exceptions\FileNameException;
 use OoFile\Exceptions\DirectoryException;
+use OoFile\Exceptions\DirectoryNotFoundException;
 
 class Upload
 {
-
     /**
      * file name
      *
@@ -59,18 +59,33 @@ class Upload
     private $tempName;
 
     /**
-     * file upload errors
+     * file upload error
      *
      * @var int
      */
-    private $errors;
+    private $error;
+
+    /**
+     * upload name
+     * file name after hashing
+     *
+     * @var string
+     */
+    private $upName;
+
+    /**
+     * upload destination
+     *
+     * @var string
+     */
+    private $destination;
 
     /**
      * max file size is set to 8MB by default
      * 1MB = 1e+6 B
      * @var string
      */
-    private $maxSize      = '8000000'; //8MB
+    private $maxSize  = '8000000'; //8MB
 
     /**
      * allowed files types to upload
@@ -81,6 +96,15 @@ class Upload
         'png','jpg','jpeg','gif',
         'image/png','image/jpeg','image/gif'
     );
+
+    /**
+     * unique file upload
+     * if file already exists do not upload
+     * check by file content and name
+     *
+     * @var boolean
+     */
+    private $isUnique = FALSE;
 
     /**
      * validation errors
@@ -96,18 +120,26 @@ class Upload
      *
      * @param string $filename
      */
-    public function __construct(string $filename)
+    public function __construct(string $filename, string $destination)
     {
         if(!isset($_FILES[$filename]))
-            throw new FileNameException("$filename file is not valid posted file", 4);
+            throw new FileNameException("$filename file is not valid posted file", 40);
+
+        if(!is_dir($destination))
+            throw new DirectoryNotFoundException("$destination is not a valid destination", 44);
+
+        if(!is_writable($destination))
+            throw new DirectoryException("$destination is not writable", 43);
 
         $this->name         = $_FILES[$filename]['name'];
         $extension          = explode('.', $this->name);
         $this->extension    = $extension[count($extension) - 1];
         $this->tempName     = $_FILES[$filename]['tmp_name'];
+        $this->upName       = SHA1($this->name) . '.' . $this->extension;
         $this->type         = $_FILES[$filename]['type'];
         $this->size         = $_FILES[$filename]['size'];
-        $this->errors       = $_FILES[$filename]['errors'];
+        $this->error        = $_FILES[$filename]['error'];
+        $this->destination  = rtrim(rtrim($destination, '\\'),'/') .'/';
     }
 
     /**
@@ -172,8 +204,26 @@ class Upload
             $this->validationErrors['size'] = 'max file size is ' . $this->maxSize;
 
         // validate no errors
-        if($this->errors != 0)
-            $this->validationErrors['errors'] =  $this->errors;
+        if($this->error != 0)
+            $this->validationErrors['errors'] =  $this->error;
+
+        if($this->isUnique == 'strict') // validate unique file content size and name
+        {
+            $file = rtrim(rtrim($this->destination,'\\'), '/') . '/' . $this->upName;
+            if(file_exists($file))
+                $this->validationErrors['name'] =  'file already exists';
+
+            if(sha1_file($file) == sha1_file($this->tempName) && filesize($file) == filesize($this->tempName))
+                $this->validationErrors['name'] =  'file size already exists';
+
+        }
+
+        if($this->isUnique == 'name') // validate only unique name
+        {
+            $file = rtrim(rtrim($this->destination,'\\'), '/') . '/' . $this->upName;
+            if(file_exists($file))
+                $this->validationErrors['name'] =  'file name already exists';
+        }
 
         if(empty($this->validationErrors))
             return TRUE;
@@ -193,13 +243,16 @@ class Upload
     }
 
     /**
-     * upload unique file
+     * unique upload
+     * if strict check both file content and name
+     * else only file name
      *
+     * @param boolean $strict
      * @return self
      */
-    public function unique() : self
+    public function unique(bool $strict = FALSE) : self
     {
-        $this->isUnique = TRUE;
+        $this->isUnique = ($strict === TRUE) ? 'strict' : 'name';
         return $this;
     }
 
@@ -208,15 +261,8 @@ class Upload
      *
      * @return boolean
      */
-    public function moveTo(string $location) : bool
+    public function proceed() : bool
     {
-        if(!is_writable($location))
-            throw new DirectoryException("You don't have permissions to upload this file", 43);
-
-        $file = MD5($this->name) . '.' . $this->extension;
-        $to   = rtrim($location, '/') .'/'. $file;
-
-        die($to);
-        return move_uploaded_file($this->tempName, $to);
+        return move_uploaded_file($this->tempName, $this->destination . $this->upName);
     }
 }
