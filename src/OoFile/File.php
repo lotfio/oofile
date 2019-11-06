@@ -34,7 +34,6 @@ namespace OoFile;
 use OoFile\Exceptions\DirectoryNotFoundException; //1
 use OoFile\Exceptions\FileModeException; //2
 use OoFile\Exceptions\FileNameException; //3
-//4
 use OoFile\Exceptions\FileNotFoundException; //5
 
 class File
