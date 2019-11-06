@@ -199,4 +199,15 @@ class File
 
         return unlink($file);
     }
+
+    /**
+     * check if file exists method
+     *
+     * @param  string $filename
+     * @return boolean
+     */
+    public function exists(string $filename) : bool
+    {
+        return file_exists($filename);
+    }
 }

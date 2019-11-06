@@ -105,4 +105,10 @@ class FileTest extends TestCase
         $this->assertTrue($delete);
         $this->assertTrue($delete2);
     }
+
+    public function testFileExists()
+    {
+        $exists = $this->file->exists('tests/temp/temp2/test2.txt');
+        $this->assertFalse($exists);
+    }
 }
