@@ -131,6 +131,15 @@ class Upload
         if(!is_writable($destination))
             throw new DirectoryException("$destination is not writable", 43);
 
+
+        print_r($this->unpackFiles($filename));
+
+
+        die;
+
+
+
+        /*
         $this->name         = $_FILES[$filename]['name'];
         $extension          = explode('.', $this->name);
         $this->extension    = $extension[count($extension) - 1];
@@ -140,6 +149,36 @@ class Upload
         $this->size         = $_FILES[$filename]['size'];
         $this->error        = $_FILES[$filename]['error'];
         $this->destination  = rtrim(rtrim($destination, '\\'),'/') . DIRECTORY_SEPARATOR;
+        */
+    }
+
+
+    /**
+     * organize files as arrays for multiple upload
+     *
+     * @param string $filename
+     * @return array
+     */
+    private function unpackFiles(string $filename) : array
+    {
+        $files = $_FILES[$filename];
+
+        if(is_array($files['name']))
+        {
+            $i = 0;
+            foreach($files['name'] as $file)
+            {
+                $arr[$i]['name']    = $files['name'][$i];
+                $arr[$i]['temp']    = $files['tmp_name'][$i];
+                $arr[$i]['type']    = $files['type'][$i];
+                $arr[$i]['size']    = $files['size'][$i];
+                $arr[$i]['error']   = $files['error'][$i];
+                $i++;
+            }
+
+           return $arr;
+        }
+        return array($files);
     }
 
     /**

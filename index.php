@@ -8,10 +8,12 @@ require 'vendor/autoload.php';
 
 if($_SERVER['REQUEST_METHOD'] == 'POST')
 {
+
     $destination = __DIR__;
     // set upload file
-    $up = new Upload('image', $destination);
-print_r($_FILES);
+    $up = new Upload('images', $destination);
+
+
     // set max size
     // 1 = 1MB
     echo '<pre>';
@@ -49,7 +51,7 @@ print_r($_FILES);
 
 <form action="" method="POST" enctype="multipart/form-data">
 
-    <input type="file" name="image">
+    <input type="file" name="images[]" multiple>
 
     <input type="submit" value="upload">
 </form>
