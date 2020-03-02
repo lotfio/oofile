@@ -143,7 +143,7 @@ class Conf
      * @param  array $conf
      * @return void
      */
-    public function add(string $key, array $conf)
+    public static function add(string $key, array $conf)
     {
         if(isset(self::$configArray[$key]))
         {
