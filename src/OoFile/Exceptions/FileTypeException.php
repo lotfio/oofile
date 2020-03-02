@@ -1,5 +1,7 @@
 <?php
 
+namespace OoFile\Exceptions;
+
 /**
  * OoFile       PHP file manipulation package.
  *
@@ -28,18 +30,6 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-use OoFile\DotEnv;
-use OoFile\Conf;
-
-if (!function_exists('env')) {
-    function env($key, $value = NULL)
-    {
-        // env should be loaded first efor config so need 
-        // to find a way to load env first and provide a dynamic 
-        // path here 
-        // better reduce new
-        $env   = new DotEnv('C:\Users\dell\Desktop\lotfio\lotfio-silo');
-        $env   ->load();
-        return $env->read($key, $value);
-    }
+class FileTypeException extends FileException
+{
 }

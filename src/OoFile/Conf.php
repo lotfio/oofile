@@ -31,64 +31,23 @@ namespace OoFile;
  * SOFTWARE.
  */
 
-use OoFile\Exceptions\ConfigException; //1
+use OoFile\Exceptions\ConfigException; 
+use OoFile\Exceptions\DirectoryException;
 use OoFile\Exceptions\FileNameException; //3
-use OoFile\Exceptions\FileNotFoundException; //3
+use OoFile\Exceptions\FileNotFoundException; //4
+use OoFile\Exceptions\FileTypeException; //5
+use OoFile\Exceptions\FileException; //5
 
 class Conf
 {
     /**
      * config array
-     * all config arrays should be merged to this array.
      *
      * @var array
      */
     public static $configArray = [
 
     ];
-
-    /**
-     * add to config array.
-     *
-     * @param string $path
-     *
-     * @return void
-     */
-    public static function add(string $path)
-    {
-        if (!is_dir($path) && !is_file($path)) {
-            throw new FileNameException('wrong file or directory path', 1);
-        }
-        if (is_dir($path)) {
-            $files = array_filter(scandir($path), function ($item) use ($path) {
-                return !is_dir($path.$item);
-            });
-
-            foreach ($files as $file) {
-                if (pathinfo($file, PATHINFO_EXTENSION) == 'php') { // if php file
-                    if (!file_exists($path.DIRECTORY_SEPARATOR.$file)) {
-                        throw new FileNotFoundException('cannot find file please provide an absolute path', 3);
-                    }
-                    $arrayFile = require $path.DIRECTORY_SEPARATOR.$file;
-
-                    $file = pathinfo($file, PATHINFO_FILENAME);
-                    if (is_array($arrayFile)) {
-                        self::$configArray[$file] = $arrayFile;
-                    }
-                }
-            }
-        }
-
-        if (is_file($path)) {
-            if (pathinfo($path, PATHINFO_EXTENSION) == 'php') {
-                $arrayFile = require $path;
-                $path = pathinfo($path, PATHINFO_FILENAME);
-                if (is_array($arrayFile)) {
-                    self::$configArray[$path] = $arrayFile;
-                }
-            }
-        }
-    }
 
     /**
      * static call for config.
@@ -99,52 +58,116 @@ class Conf
     }
 
     /**
-     * get config from array.
+     * add config file to config array.
+     *
+     * @param string $filename
+     *
+     * @return void
+     */
+    public static function load(string $filename)
+    {
+        if (!is_file($filename)) {
+            throw new FileNotFoundException("config file $filename not found", 4);
+        }
+
+        if (pathinfo($filename, PATHINFO_EXTENSION) !== 'php') {
+            throw new FileTypeException("config file $filename must be of type php", 5);
+        }
+
+        $arrayFile = require $filename;
+
+        if (!is_array($arrayFile)) {
+            throw new FileException('config file must be a valid php array', 5);
+        }
+
+        $name = pathinfo($filename, PATHINFO_FILENAME);
+
+        if (isset(self::$configArray[$name])) {
+            
+            return self::$configArray[$name] = array_merge(self::$configArray[$name], $arrayFile);
+        }
+            
+        return self::$configArray = array_merge(self::$configArray, [$name => $arrayFile]);
+    }
+
+    /**
+     * add a directory of config files
+     *
+     * @param string $path
+     * @return void
+     */
+    public static function loadDir(string $path)
+    {
+        if (!is_dir($path)) {
+            throw new DirectoryException('wrong directory path', 1);
+        }
+        
+        $files = array_filter(scandir($path), function ($item) use ($path) {
+            return !is_dir($path.$item);
+        });
+
+        if(count($files) < 1) {
+            throw new FileNotFoundException("$path directory has no config files", 3);
+        }
+
+        foreach ($files as $file) {
+            if (pathinfo($file, PATHINFO_EXTENSION) == 'php') { // if php file
+
+                if (!file_exists($path.DIRECTORY_SEPARATOR.$file)) {
+                    throw new FileNotFoundException('cannot find file please provide an absolute path', 3);
+                }
+
+                $arrayFile = require $path.DIRECTORY_SEPARATOR.$file;
+
+                if (!is_array($arrayFile)) {
+                    throw new FileException('config file must be a valid php array', 5);
+                }
+
+                $name = pathinfo($file, PATHINFO_FILENAME);
+
+                if(isset(self::$configArray[$name])) {
+                    self::$configArray[$name] = array_merge(self::$configArray[$name], $arrayFile);
+                }else{
+                    self::$configArray        = array_merge(self::$configArray, [$name => $arrayFile]);
+                }
+            }
+        }
+
+        return self::$configArray;
+    }
+
+    /**
+     * adding a config to config array
+     *
+     * @param  string $key
+     * @param  array $conf
+     * @return void
+     */
+    public function add(string $key, array $conf)
+    {
+        if(isset(self::$configArray[$key]))
+        {
+            return self::$configArray[$key] = array_merge(self::$configArray[$key], $conf);
+        }
+
+        return self::$configArray[$key] = $conf;
+    }
+
+    /**
+     * get config from array or add.
      *
      * @param string $key
      *
      * @return mixed
      */
-    public static function get(string $config, string $key, $value = null)
+    public static function get(string $config, string $key, string $value = null)
     {
-        if (!array_key_exists($config, self::$configArray)) {
-            throw new ConfigException(" $config config method doesn't exists", 4);
-        }
-        if (is_null($value)) {
-            if (!array_key_exists($key, self::$configArray[$config])) {
-                throw new ConfigException("config key $key doesn't exist", 4);
-            }
-
+       if(isset(self::$configArray[$config]) && isset(self::$configArray[$config][$key]))
+        {
             return self::$configArray[$config][$key];
         }
 
         return self::$configArray[$config][$key] = $value;
-    }
-
-    /**
-     * add to an array
-     * add arrays or string values.
-     */
-    public static function append(string $config, string $key, $value = null)
-    {
-        if (!array_key_exists($config, self::$configArray)) {
-            throw new ConfigException("config key $config doesn't exist", 4);
-        }
-        if (!array_key_exists($key, self::$configArray[$config])) { // if key doesn't exists add it and append to it
-            self::$configArray[$config][$key] = [];
-        }
-
-        if (is_string(self::$configArray[$config][$key])) { // if string
-            self::$configArray[$config][$key] = [
-                self::$configArray[$config][$key],
-            ];
-        }
-
-        if (is_array($value)) {
-            return self::$configArray[$config][$key] = array_merge(self::$configArray[$config][$key], $value);
-        }
-
-        return self::$configArray[$config][$key][] = $value;
     }
 
     /**
