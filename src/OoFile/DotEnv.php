@@ -41,7 +41,9 @@ class DotEnv
      *
      * @var array
      */
-    private $envArray;
+    private $envArray = array(
+
+    );
 
     /**
      * env path
@@ -142,9 +144,9 @@ class DotEnv
     /**
      * read from env
      *
-     * @return string
+     * @return ?string
      */
-    public function read(string $key, string $default = NULL) : string
+    public function read(string $key, string $default = NULL) : ?string
     {
         if (isset($this->envArray[strtoupper($key)]))
             return $this->envArray[strtoupper($key)];
