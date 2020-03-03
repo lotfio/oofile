@@ -1,7 +1,7 @@
 # Available Methods
 ```php
 /**
- * $filename   : input file name
+ * $filename    : input file name
  * $destination : where to save file
  */
  $up = new Upload($filename, $destination) : void
