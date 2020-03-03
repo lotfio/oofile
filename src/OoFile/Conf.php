@@ -46,7 +46,6 @@ class Conf
      * @var array
      */
     public static $configArray = [
-
     ];
 
     /**
@@ -62,9 +61,9 @@ class Conf
      *
      * @param string $filename
      *
-     * @return void
+     * @return array
      */
-    public static function load(string $filename)
+    public static function load(string $filename) : array
     {
         if (!is_file($filename)) {
             throw new FileNotFoundException("config file $filename not found", 4);
@@ -93,10 +92,10 @@ class Conf
     /**
      * add a directory of config files
      *
-     * @param string $path
-     * @return void
+     * @param  string $path
+     * @return array
      */
-    public static function loadDir(string $path)
+    public static function loadDir(string $path) : array
     {
         if (!is_dir($path)) {
             throw new DirectoryException('wrong directory path', 1);
@@ -141,7 +140,7 @@ class Conf
      *
      * @param  string $key
      * @param  array $conf
-     * @return void
+     * @return mixed
      */
     public static function add(string $key, array $conf)
     {
@@ -158,9 +157,9 @@ class Conf
      *
      * @param string $key
      *
-     * @return mixed
+     * @return string
      */
-    public static function get(string $config, string $key, string $value = null)
+    public static function get(string $config, string $key, string $value = null) : string
     {
        if(isset(self::$configArray[$config]) && isset(self::$configArray[$config][$key]))
         {

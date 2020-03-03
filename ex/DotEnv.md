@@ -14,7 +14,7 @@ $env = new DotEnv(string $projectDir)
  * example env by default is set to .env.example (it can be changed from conf::env('filename'))
  * 
  */
-initialize(void) : bool
+$env->initialize(void) : bool
 ```
 
 ```php
@@ -22,7 +22,7 @@ initialize(void) : bool
  * parse and load env file to env array
  * 
  */
-load(void) : array
+$env->load(void) : array
 ```
 
 ```php
@@ -30,7 +30,7 @@ load(void) : array
  * change env key value
  * 
  */
-changeValue(string $key, string $value) : array
+$env->changeValue(string $key, string $value) : array
 ```
 
 ```php
@@ -38,7 +38,7 @@ changeValue(string $key, string $value) : array
  * update env file
  * 
  */
-update() : int
+$env->update() : int
 ```
 
 ```php
@@ -46,7 +46,7 @@ update() : int
  * read env file key
  * 
  */
-read(string $key, string $default = NULL) : string
+$env->read(string $key, string $default = NULL) : string
 ```
 
 ```php
@@ -54,5 +54,5 @@ read(string $key, string $default = NULL) : string
  * delete env file key
  * 
  */
-delete() : bool
+$env->delete() : bool
 ```
