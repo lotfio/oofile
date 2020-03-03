@@ -65,9 +65,9 @@ class DotEnv
      *
      * @param string $path where to initialize .env
      *
-     * @return void
+     * @return bool
      */
-    public function initialize()
+    public function initialize() : bool
     {   
         $exEnv      = Conf::env('filename', '.env.example');
         $example    = $this->path . $exEnv;
@@ -83,9 +83,9 @@ class DotEnv
     /**
      * load env file
      *
-     * @return void
+     * @return array
      */
-    public function load()
+    public function load() : array
     {
         if (!file_exists($this->path))
             throw new FileNotFoundException(" example .env file not found");
@@ -107,9 +107,9 @@ class DotEnv
      *
      * @param  string $key
      * @param  string $value
-     * @return void
+     * @return array
      */
-    public function changeValue(string $key, string $value)
+    public function changeValue(string $key, string $value) : array
     {
         if(!isset($this->envArray[strtoupper($key)]))
             die("env key doesnot exists");
@@ -122,9 +122,9 @@ class DotEnv
     /**
      * update env file.
      *
-     * @return string
+     * @return int
      */
-    public function update()
+    public function update() : int
     {
         $str = '';
 
@@ -136,15 +136,15 @@ class DotEnv
             $str .= $key . str_repeat(' ', $longest - strlen($key)) . ":  " . $value . "\n";
         }
 
-        file_put_contents($this->path . '.env', $str);
+        return file_put_contents($this->path . '.env', $str);
     }
 
     /**
      * read from env
      *
-     * @return void
+     * @return string
      */
-    public function read(string $key, string $default = NULL)
+    public function read(string $key, string $default = NULL) : string
     {
         if (isset($this->envArray[strtoupper($key)]))
             return $this->envArray[strtoupper($key)];
@@ -155,9 +155,9 @@ class DotEnv
     /**
      * delete dot env file.
      * 
-     * @return void
+     * @return bool
      */
-    public function delete()
+    public function delete() : bool
     {
         $env = $this->path . '.env';
 
