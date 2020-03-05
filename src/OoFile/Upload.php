@@ -38,47 +38,54 @@ use OoFile\Exceptions\DirectoryNotFoundException;
 class Upload
 {
     /**
-     * file name
-     *
-     * @var string
-     */
-    private $name;
-
-    /**
-     * file extension
-     *
-     * @var string
-     */
-    private $extension;
-
-    /**
-     * temporary file name
-     *
-     * @var string
-     */
-    private $tempName;
-
-    /**
-     * file upload error
+     * number of files
      *
      * @var int
      */
-    private $error;
+    private $numberOfFiles;
 
     /**
-     * upload name
+     * file names
+     *
+     * @var string
+     */
+    private $names;
+
+    /**
+     * file extensions
+     *
+     * @var string
+     */
+    private $extensions;
+
+    /**
+     * temporary file names
+     *
+     * @var string
+     */
+    private $tempNames;
+
+    /**
+     * file upload errors
+     *
+     * @var int
+     */
+    private $errors;
+
+    /**
+     * upload names
      * file name after hashing
      *
      * @var string
      */
-    private $upName;
+    private $upNames;
 
     /**
-     * upload destination
+     * upload destinations
      *
      * @var string
      */
-    private $destination;
+    private $destinations;
 
     /**
      * max file size is set to 8MB by default
@@ -132,24 +139,26 @@ class Upload
             throw new DirectoryException("$destination is not writable", 43);
 
 
-        print_r($this->unpackFiles($filename));
+        // number of files
+        $this->numberOfFiles = count($this->unpackFiles($filename));
 
+        $i = 0;
+        foreach($this->unpackFiles($filename) as $file)
+        {
+            $this->names[$i]         = $file['name'];
+            $extension              = explode('.', $file['name']);
+            $this->extensions[$i]    = $extension[count($extension) - 1];
 
-        die;
+            $this->tempNames[$i]     = $file['temp'];
 
+            $this->upNames[$i]       = SHA1($this->names[$i]) . '.' . $this->extensions[$i];
+            $this->types[$i]         = $file['type'];
+            $this->sizes[$i]         = $file['size'];
+            $this->errors[$i]        = $file['error'];
+            $this->destinations[$i]  = rtrim(rtrim($destination, '\\'),'/') . DIRECTORY_SEPARATOR;
 
-
-        /*
-        $this->name         = $_FILES[$filename]['name'];
-        $extension          = explode('.', $this->name);
-        $this->extension    = $extension[count($extension) - 1];
-        $this->tempName     = $_FILES[$filename]['tmp_name'];
-        $this->upName       = SHA1($this->name) . '.' . $this->extension;
-        $this->type         = $_FILES[$filename]['type'];
-        $this->size         = $_FILES[$filename]['size'];
-        $this->error        = $_FILES[$filename]['error'];
-        $this->destination  = rtrim(rtrim($destination, '\\'),'/') . DIRECTORY_SEPARATOR;
-        */
+            $i++;
+        }
     }
 
 
@@ -162,6 +171,7 @@ class Upload
     private function unpackFiles(string $filename) : array
     {
         $files = $_FILES[$filename];
+        $arr   = array();
 
         if(is_array($files['name']))
         {
@@ -235,9 +245,13 @@ class Upload
     {
         // validate extension && file type
         // both .ext and MIME type validation
-        if(!in_array($this->extension, $this->allowedTypes) || !in_array($this->type, $this->allowedTypes))
-            $this->validationErrors['type'] = 'file type is not allowed';
+        for($i = 0; $i < $this->numberOfFiles; $i++)
+        {
+            if(!in_array($this->extensions[$i], $this->allowedTypes) || !in_array($this->types[$i], $this->allowedTypes))
+                $this->validationErrors['type'] = 'file type is not allowed';
+        }
 
+/*
         // validate file size
         if($this->size > $this->maxSize)
             $this->validationErrors['size'] = 'max file size is ' . $this->maxSize;
@@ -267,7 +281,7 @@ class Upload
 
         if(empty($this->validationErrors))
             return TRUE;
-
+*/
         return FALSE;
     }
 
