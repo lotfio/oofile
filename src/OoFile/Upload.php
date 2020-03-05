@@ -111,7 +111,9 @@ class Upload
      *
      * @var boolean
      */
-    private $isUnique = FALSE;
+    private $isUnique = array(
+
+    );
 
     /**
      * validation errors
@@ -156,6 +158,7 @@ class Upload
             $this->sizes[$i]         = $file['size'];
             $this->errors[$i]        = $file['error'];
             $this->destinations[$i]  = rtrim(rtrim($destination, '\\'),'/') . DIRECTORY_SEPARATOR;
+            $this->isUnique[$i]      = FALSE;
 
             $i++;
         }
@@ -245,43 +248,44 @@ class Upload
     {
         // validate extension && file type
         // both .ext and MIME type validation
-        for($i = 0; $i < $this->numberOfFiles; $i++)
-        {
-            if(!in_array($this->extensions[$i], $this->allowedTypes) || !in_array($this->types[$i], $this->allowedTypes))
-                $this->validationErrors['type'] = 'file type is not allowed';
-        }
+        for ($i = 0; $i < $this->numberOfFiles; $i++) {
 
-/*
-        // validate file size
-        if($this->size > $this->maxSize)
-            $this->validationErrors['size'] = 'max file size is ' . $this->maxSize;
+            if (!in_array($this->extensions[$i], $this->allowedTypes) || !in_array($this->types[$i], $this->allowedTypes)) {
+                $this->validationErrors[$i]['type'] = $this->types[$i] . ' file type is not allowed';
+            }
 
-        // validate no errors
-        if($this->error != 0)
-            $this->validationErrors['error'] =  $this->errorTypes($this->error);
 
-        // validate unique file content size and name
-        if($this->isUnique == 'strict')
-        {
-            $file = $this->destination . $this->upName;
-            if(file_exists($file))
-            {
-                if(sha1_file($file) == sha1_file($this->tempName) && filesize($file) == filesize($this->tempName))
-                $this->validationErrors['name'] =  'file already exists (same size and content)';
+            // validate file size
+            if ($this->sizes[$i] > $this->maxSize) {
+                $this->validationErrors[$i]['size'] = 'max file size is ' . $this->maxSize;
+            }
+
+            // validate no errors
+            if ($this->errors[$i] != 0) {
+                $this->validationErrors[$i]['error'] =  $this->errorTypes($this->errors[$i]);
+            }
+
+            // validate unique file content size and name
+            if ($this->isUnique[$i] == 'strict') {
+                $file = $this->destinations[$i] . $this->upNames[$i];
+                if (file_exists($file)) {
+                    if (sha1_file($file) == sha1_file($this->tempNames[$i]) && filesize($file) == filesize($this->tempNames[$i])) {
+                        $this->validationErrors[$i]['name'] =  'file already exists (same size and content)';
+                    }
+                }
+            }
+
+                // validate unique file content size and name
+            if ($this->isUnique[$i] == 'name') { // validate only unique name
+                $file = $this->destinations[$i] . $this->upNames[$i];
+                if (file_exists($file)) {
+                    $this->validationErrors[$i]['name'] =  'file name already exists';
+                }
             }
         }
-
-        // validate unique file content size and name
-        if($this->isUnique == 'name') // validate only unique name
-        {
-            $file = $this->destination . $this->upName;
-            if(file_exists($file))
-                $this->validationErrors['name'] =  'file name already exists';
-        }
-
         if(empty($this->validationErrors))
             return TRUE;
-*/
+
         return FALSE;
     }
 
@@ -343,7 +347,10 @@ class Upload
      */
     public function unique(bool $strict = FALSE) : self
     {
-        $this->isUnique = ($strict === TRUE) ? 'strict' : 'name';
+        for($i = 0; $i < $this->numberOfFiles; $i++)
+        {
+            $this->isUnique[$i] = ($strict === TRUE) ? 'strict' : 'name';
+        }
         return $this;
     }
 
@@ -352,12 +359,19 @@ class Upload
      *
      * @return boolean
      */
-    public function proceed() : bool
+    public function proceed() : array
     {
-        // if not unique allow duplicate with new name
-        if($this->isUnique === FALSE)
-            $this->upName = SHA1(bin2hex(random_bytes(10)) . substr(uniqid(), -7, 5) . $this->upName) . '.' . $this->extension;
+        $uploaded = array();
 
-        return move_uploaded_file($this->tempName, $this->destination . $this->upName);
+        for($i = 0; $i < $this->numberOfFiles; $i++)
+        {
+            // if not unique allow duplicate with new name
+            if($this->isUnique[$i] === FALSE)
+                $this->upNames[$i]    = SHA1(bin2hex(random_bytes(10)) . substr(uniqid(), -7, 5) . $this->upNames[$i]) . '.' . $this->extensions[$i];
+
+            $uploaded[$this->upNames[$i]] =  move_uploaded_file($this->tempNames[$i], $this->destinations[$i] . $this->upNames[$i]);
+        }
+
+        return $uploaded;
     }
 }
