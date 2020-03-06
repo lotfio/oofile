@@ -148,7 +148,7 @@ class Upload
         foreach($this->unpackFiles($filename) as $file)
         {
             $this->names[$i]         = $file['name'];
-            $extension              = explode('.', $file['name']);
+            $extension               = explode('.', $file['name']);
             $this->extensions[$i]    = $extension[count($extension) - 1];
 
             $this->tempNames[$i]     = $file['temp'];
@@ -191,7 +191,16 @@ class Upload
 
            return $arr;
         }
-        return array($files);
+
+        $file = array();
+        $file[0]['name']   = $files['name'];
+        $file[0]['temp']   = $files['tmp_name'];
+        $file[0]['type']   = $files['type'];
+        $file[0]['size']   = $files['size'];
+        $file[0]['error']  = $files['error'];
+
+
+        return $file;
     }
 
     /**
@@ -295,7 +304,7 @@ class Upload
      * @param  integer $code
      * @return string
      */
-    public function errorTypes(int $code) : string
+    private function errorTypes(int $code) : string
     {
         switch ($code) {
             case UPLOAD_ERR_INI_SIZE:
@@ -367,9 +376,11 @@ class Upload
         {
             // if not unique allow duplicate with new name
             if($this->isUnique[$i] === FALSE)
-                $this->upNames[$i]    = SHA1(bin2hex(random_bytes(10)) . substr(uniqid(), -7, 5) . $this->upNames[$i]) . '.' . $this->extensions[$i];
+                $this->upNames[$i]  = SHA1(bin2hex(random_bytes(10)) . substr(uniqid(), -7, 5) . $this->upNames[$i]) . '.' . $this->extensions[$i];
 
-            $uploaded[$this->upNames[$i]] =  move_uploaded_file($this->tempNames[$i], $this->destinations[$i] . $this->upNames[$i]);
+            $uploaded[$this->upNames[$i]] 
+                =  
+            move_uploaded_file($this->tempNames[$i], $this->destinations[$i] . $this->upNames[$i]);
         }
 
         return $uploaded;
