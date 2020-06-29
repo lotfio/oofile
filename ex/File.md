@@ -3,7 +3,7 @@
 /**
  * get instance
  */
- $up = new File
+ $oo = new File;
 ```
 
 ```php
@@ -13,7 +13,7 @@
  * @param $file string file name
  * @param $mode string file create mode
  */
- $up->create(string $file, string $mode = 'w+') : bool
+ $oo->create(string $file, string $mode = 'w+') : bool
 ```
 
 ```php
@@ -23,7 +23,7 @@
  * @param $file string file name
  * @param $content string content
  */
- $up->write(string $file, string $content) : bool
+ $oo->write(string $file, string $content) : bool
 ```
 
 ```php
@@ -32,7 +32,7 @@
  *
  * @param $file string file name
  */
- $up->size(string $file) : int
+ $oo->size(string $file) : int
 ```
 
 ```php
@@ -42,7 +42,7 @@
  * @param $old string old file name
  * @param $new string new file name
  */
- $up->rename(string $old, string $new) : bool
+ $oo->rename(string $old, string $new) : bool
 ```
 
 ```php
@@ -52,7 +52,7 @@
  * @param $old string file name
  * @param $new string new file
  */
- $up->copy(string $old, string $new) : bool
+ $oo->copy(string $old, string $new) : bool
 ```
 
 ```php
@@ -62,7 +62,7 @@
  * @param $file string file name
  * @param $destination string
  */
- $up->move(string $file, string $destination) : bool
+ $oo->move(string $file, string $destination) : bool
 ```
 
 ```php
@@ -71,7 +71,7 @@
  *
  * @param $file string file name
  */
- $up->delete(string $file) : bool
+ $oo->delete(string $file) : bool
 ```
 
 ```php
@@ -80,5 +80,5 @@
  *
  * @param $file string file name
  */
- $up->exists(string $filename) : bool
+ $oo->exists(string $filename) : bool
 ```
