@@ -42,7 +42,6 @@ class File
      * file modes.
      *
      * @var array
-     * TODO:: add modes dynamically
      */
     private $modes = [
         'r', 'r+',

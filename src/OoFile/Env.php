@@ -156,16 +156,14 @@ class Env
      *
      * @param  string $key
      * @param  string $value
-     * @return array
+     * @return string
      */
-    public function set(string $key, string $value) : array
+    public function set(string $key, string $value) : string
     {
         if(!isset($this->envArray[strtoupper($key)]))
             throw new EnvException("env key does not exists", 4);
 
-        $this->envArray[strtoupper($key)] = $value;
-
-        return $this->envArray;
+        return $this->envArray[strtoupper($key)] = $value;
     }
 
     /**
