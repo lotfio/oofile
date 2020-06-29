@@ -29,7 +29,6 @@
  * SOFTWARE.
  */
 use OoFile\Env;
-use OoFile\Conf;
 
 if (!function_exists('_env')) {
     function _env($key, $value = NULL)
