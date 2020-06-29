@@ -18,10 +18,10 @@
 ```php
 /**
  * $types : array|string  of types to be allowed
- * better use both extention and MIME TYPE : ['txt', 'text/plain']
+ * better use both extension and MIME TYPE : ['txt', 'text/plain']
  * default allowed files are images
  */
- $up->addAllowedTypes($types) : self 
+ $up->addAllowedTypes($types) : self
 ```
 ```php
 /**
@@ -31,9 +31,9 @@
 ```
 ```php
 /**
- * $strict : check if file already uploaded 
- * default false => checks only file name
- * TRUE  => checks file name size and content with sha1_file and file_size
+ * $strict :  check if file already uploaded
+ * default   false => checks only file name
+ *          TRUE  => checks file name size and content with sha1_file and file_size
  */
 $up->unique($strict = FALSE) : self
 ```
