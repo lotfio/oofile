@@ -113,7 +113,7 @@ class Env
     }
 
     /**
-     * update env file. after changing values
+     * update env file. after changing values (uses envArray)
      *
      * @return int
      */
@@ -122,7 +122,7 @@ class Env
         $str = '';
 
         $longest = array_map(function($k){ return strlen($k);}, array_keys($this->envArray));
-        $longest = (count($longest) > 0) ? $longest + 2 : 0; // extra white spaces
+        $longest = (count($longest) > 0) ? max($longest) + 2 : 0; // extra white spaces
 
         foreach($this->envArray as $key => $value)
         {
@@ -161,7 +161,7 @@ class Env
     public function set(string $key, string $value) : array
     {
         if(!isset($this->envArray[strtoupper($key)]))
-            throw new EnvException("nv key does not exists", 4);
+            throw new EnvException("env key does not exists", 4);
 
         $this->envArray[strtoupper($key)] = $value;
 
