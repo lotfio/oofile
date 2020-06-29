@@ -42,6 +42,7 @@ class File
      * file modes.
      *
      * @var array
+     * TODO:: add modes dynamically
      */
     private $modes = [
         'r', 'r+',
@@ -84,14 +85,14 @@ class File
      * @param string $file
      * @param string $content
      *
-     * @return void
+     * @return bool
      */
-    public function write(string $file, string $content)
+    public function write(string $file, string $content) : bool
     {
         if (!file_exists($file)) {
-            throw new NotFoundException("file $file not found", 4);
+            throw new FileNotFoundException("file $file not found", 4);
         }
-        $handle = fopen($file, 'r+');
+        $handle = fopen($file, 'w+');
         fwrite($handle, $content);
 
         return fclose($handle);
@@ -107,7 +108,7 @@ class File
     public function size(string $file) : int
     {
         if (!file_exists($file)) {
-            throw new NotFoundException("file $file not found", 4);
+            throw new FileNotFoundException("file $file not found", 4);
         }
 
         return filesize($file);

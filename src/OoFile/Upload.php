@@ -284,7 +284,7 @@ class Upload
                 }
             }
 
-                // validate unique file content size and name
+            // validate unique file content size and name
             if ($this->isUnique[$i] == 'name') { // validate only unique name
                 $file = $this->destinations[$i] . $this->upNames[$i];
                 if (file_exists($file)) {
@@ -378,8 +378,8 @@ class Upload
             if($this->isUnique[$i] === FALSE)
                 $this->upNames[$i]  = SHA1(bin2hex(random_bytes(10)) . substr(uniqid(), -7, 5) . $this->upNames[$i]) . '.' . $this->extensions[$i];
 
-            $uploaded[$this->upNames[$i]] 
-                =  
+            $uploaded[$this->upNames[$i]]
+                =
             move_uploaded_file($this->tempNames[$i], $this->destinations[$i] . $this->upNames[$i]);
         }
 

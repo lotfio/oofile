@@ -32,9 +32,10 @@ namespace OoFile;
  */
 
 use OoFile\Exceptions\DirectoryException;
-use OoFile\Exceptions\FileNotFoundException; //3
+use OoFile\Exceptions\FileNotFoundException;
+use OoFile\Exceptions\EnvException;
 
-class DotEnv
+class Env
 {
     /**
      * env array
@@ -53,13 +54,21 @@ class DotEnv
     private $path;
 
     /**
+     * file manager
+     *
+     * @var File
+     */
+    private $fileManager;
+
+    /**
      * init
      *
      * @param string $path
      */
     public function __construct(string $path)
     {
-        $this->path = rtrim($path, "/\\") . DIRECTORY_SEPARATOR;
+        $this->path         = rtrim($path, "/\\") . DIRECTORY_SEPARATOR;
+        $this->fileManager  = new File;
     }
 
     /**
@@ -69,17 +78,15 @@ class DotEnv
      *
      * @return bool
      */
-    public function initialize() : bool
-    {   
-        $exEnv      = Conf::env('filename', '.env.example');
-        $example    = $this->path . $exEnv;
+    public function init() : bool
+    {
+        $example    = $this->path . '.env.example';
         $env        = $this->path . '.env';
 
         if (!file_exists($example))
             throw new FileNotFoundException(" example .env file $example not found");
 
-        $file = (new File());
-        return $file->copy($example, $env);
+        return $this->fileManager->copy($example, $env);
     }
 
     /**
@@ -89,7 +96,7 @@ class DotEnv
      */
     public function load() : array
     {
-        if (!file_exists($this->path))
+        if (!is_file($this->path . '.env'))
             throw new FileNotFoundException(" example .env file not found");
 
         $handle = fopen($this->path . '.env', 'r');
@@ -101,7 +108,47 @@ class DotEnv
                 $this->envArray[trim($env[0])] = trim($env[1]);
             }
         }
+
         return $this->envArray;
+    }
+
+    /**
+     * update env file. after changing values
+     *
+     * @return int
+     */
+    public function update() : bool
+    {
+        $str = '';
+
+        $longest = array_map(function($k){ return strlen($k);}, array_keys($this->envArray));
+        $longest = (count($longest) > 0) ? $longest + 2 : 0; // extra white spaces
+
+        foreach($this->envArray as $key => $value)
+        {
+            $str .= $key . str_repeat(' ', $longest - strlen($key)) . ":  " . $value . "\n";
+        }
+
+        return $this->fileManager->write($this->path . '.env', $str);
+    }
+
+    /**
+     * delete dot env file.
+     *
+     * @return bool
+     */
+    public function delete() : bool
+    {
+        $env = $this->path . '.env';
+
+        if (!file_exists($env)) {
+            throw new FileNotFoundException("$env file not found");
+        }
+        if (!is_writable($this->path)) {
+            throw new DirectoryException("can not delete .env file $this->path is not writable");
+        }
+
+        return $this->fileManager->delete($env);
     }
 
     /**
@@ -111,10 +158,10 @@ class DotEnv
      * @param  string $value
      * @return array
      */
-    public function changeValue(string $key, string $value) : array
+    public function set(string $key, string $value) : array
     {
         if(!isset($this->envArray[strtoupper($key)]))
-            die("env key doesnot exists");
+            throw new EnvException("nv key does not exists", 4);
 
         $this->envArray[strtoupper($key)] = $value;
 
@@ -122,54 +169,15 @@ class DotEnv
     }
 
     /**
-     * update env file.
-     *
-     * @return int
-     */
-    public function update() : int
-    {
-        $str = '';
-
-        $longest = max(array_map(function($k){ return strlen($k);}, array_keys($this->envArray)));
-        $longest = $longest + 2; // extra whte spaces
-
-        foreach($this->envArray as $key => $value)
-        {
-            $str .= $key . str_repeat(' ', $longest - strlen($key)) . ":  " . $value . "\n";
-        }
-
-        return file_put_contents($this->path . '.env', $str);
-    }
-
-    /**
      * read from env
      *
      * @return ?string
      */
-    public function read(string $key, string $default = NULL) : ?string
+    public function get(string $key, string $default = NULL) : ?string
     {
         if (isset($this->envArray[strtoupper($key)]))
             return $this->envArray[strtoupper($key)];
-        
+
         return $this->envArray[strtoupper($key)] = $default;
-    }
-
-    /**
-     * delete dot env file.
-     * 
-     * @return bool
-     */
-    public function delete() : bool
-    {
-        $env = $this->path . '.env';
-
-        if (!file_exists($dotEnv)) {
-            throw new FileNotFoundException("$env file not found");
-        }
-        if (!is_writable($this->path)) {
-            throw new DirectoryException("can not delete .env file $this->path is not writable");
-        }
-
-        return unlink($env);
     }
 }
