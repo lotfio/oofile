@@ -23,12 +23,14 @@
  */
  $up->addAllowedTypes($types) : self
 ```
+
 ```php
 /**
  * this method can be used to override default allowed types which is images only
  */
  $up->resetAllowedTypes($arrayOfTypes) : self
 ```
+
 ```php
 /**
  * $strict :  check if file already uploaded
@@ -37,12 +39,14 @@
  */
 $up->unique($strict = FALSE) : self
 ```
+
 ```php
 /**
  * check if no errors and file can be uploaded
  */
  $up->isValid() : void
 ```
+
 ```php
 /**
  * upload file
@@ -50,6 +54,7 @@ $up->unique($strict = FALSE) : self
  $up->proceed() : bool
 
 ```
+
 ```php
 /**
  * errors array. can be used if validation fails
