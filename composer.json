@@ -10,9 +10,8 @@
     ],
 
     "minimum-stability": "dev",
-    
+
     "autoload": {
-        "files": ["src/OoFile/functions.php"],
         "psr-4": {
             "OoFile\\" : "src/OoFile/"
         }

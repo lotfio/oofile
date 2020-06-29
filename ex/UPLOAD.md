@@ -34,8 +34,8 @@
 ```php
 /**
  * $strict :  check if file already uploaded
- * default   false => checks only file name
- *          TRUE  => checks file name size and content with sha1_file and file_size
+ * default   FALSE => checks only file name
+ *           TRUE  => checks file name size and content with sha1_file and file_size
  */
 $up->unique($strict = FALSE) : self
 ```
@@ -44,14 +44,14 @@ $up->unique($strict = FALSE) : self
 /**
  * check if no errors and file can be uploaded
  */
- $up->isValid() : void
+ $up->isValid() : bool
 ```
 
 ```php
 /**
  * upload file
  */
- $up->proceed() : bool
+ $up->proceed() : array
 
 ```
 
