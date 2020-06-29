@@ -14,10 +14,11 @@
 ## About OoFile package :
 
 OoFile is a file handling package That helps you to play around with php file system, environment variables and config files.
-- OoFile can help you :
+ - OoFile can help you :
  - read, write, create, delete, and handle files.
  - initialize .env file and get environment variables.
  - manipulate config files.
+ - upload single & multiple files
 
 ## Contributing
 
