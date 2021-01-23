@@ -19,7 +19,7 @@ class DotEnvTest extends TestCase
     /**
      * set up our object.
      */
-    public function setUp() : void
+    protected function setUp(): void
     {
         $this->env = new DotEnv();
     }
